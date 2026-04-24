@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERP Training — Giai đoạn 4: Dashboard, KPI & Data Design</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --white:#ffffff; --bg:#f8f9fb; --bg2:#f1f3f7;
+  --border:#e4e7ed; --border2:#cdd2dc;
+  --text:#0f1623; --text2:#4a5568; --text3:#8896ab;
+  --blue:#1a6cf6; --blue-lt:#e8f0fe; --blue-md:#b8d0fc;
+  --teal:#0b8a78; --teal-lt:#e0f5f2; --teal-md:#9dddd5;
+  --amber:#c97c0a; --amber-lt:#fef5e4; --amber-md:#f9d98a;
+  --red:#d63030;  --red-lt:#fee8e8;   --red-md:#f5b0b0;
+  --green:#1a8a42;--green-lt:#e4f8ed; --green-md:#9ddcb8;
+  --purple:#6a3fc8;--purple-lt:#f0eaff;--purple-md:#c9b8f5;
+  --coral:#d45020;--coral-lt:#fdeee8; --coral-md:#f5bba0;
+  --font:'Plus Jakarta Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --shadow-md:0 2px 8px rgba(0,0,0,.08),0 12px 32px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--text);line-height:1.7;font-weight:300;font-size:14px}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:244px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;z-index:100;padding-bottom:32px}
+.sb-head{padding:20px 18px 14px;border-bottom:1px solid var(--border)}
+.sb-phase{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--blue);margin-bottom:3px}
+.sb-title{font-size:13px;font-weight:600;line-height:1.4}
+.sb-meta{font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)}
+.nav-sec{padding:12px 10px 4px}
+.nav-sec-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:4px;display:block}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:12px;font-weight:400;color:var(--text2);text-decoration:none;transition:all .12s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.nav-a:hover{background:var(--bg);color:var(--text)}
+.nav-a.active{background:var(--blue-lt);color:var(--blue);font-weight:600}
+.nav-a.done{color:var(--text3)}
+.nav-a.locked{opacity:.35;pointer-events:none}
+.nav-ic{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.nav-tag{margin-left:auto;font-size:9px;font-family:var(--mono);background:var(--bg2);color:var(--text3);padding:1px 5px;border-radius:4px}
+.nav-a.active .nav-tag{background:var(--blue-lt);color:var(--blue)}
+.nav-sep{height:1px;background:var(--border);margin:6px 10px}
+
+/* ── TOPBAR ── */
+.topbar{position:fixed;left:244px;right:0;top:0;height:44px;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;z-index:90}
+.bc{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.bc-sep{color:var(--border2)}
+.bc-cur{color:var(--text);font-weight:600}
+.prog-wrap{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--text3)}
+.prog-bar{width:68px;height:3px;background:var(--bg2);border-radius:2px}
+.prog-fill{height:100%;background:var(--blue);border-radius:2px;transition:width .15s}
+
+/* ── LAYOUT ── */
+.main{margin-left:244px;padding-top:44px}
+.content{max-width:880px;margin:0 auto;padding:44px 36px 100px}
+
+/* ── PAGE HEADER ── */
+.pg-head{margin-bottom:44px;padding-bottom:28px;border-bottom:1px solid var(--border)}
+.phase-pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--blue);background:var(--blue-lt);border:1px solid var(--blue-md);padding:3px 10px;border-radius:20px;margin-bottom:14px}
+h1{font-size:30px;font-weight:700;line-height:1.2;letter-spacing:-.5px;color:var(--text);margin-bottom:10px}
+.pg-desc{font-size:14px;color:var(--text2);line-height:1.8;max-width:620px;font-weight:300}
+.meta-row{display:flex;gap:18px;margin-top:14px;flex-wrap:wrap}
+.meta-chip{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.m-dot{width:6px;height:6px;border-radius:50%}
+
+/* ── SECTION ── */
+.section{margin-bottom:56px}
+.sec-label{display:flex;align-items:center;gap:10px;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);margin-bottom:14px;margin-top:32px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sec-num{width:26px;height:26px;border-radius:6px;background:var(--blue-lt);border:1px solid var(--blue-md);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blue);font-family:var(--mono);flex-shrink:0}
+.sec-title{font-size:18px;font-weight:700;color:var(--text)}
+.sec-sub{font-size:12px;color:var(--text3);margin-bottom:18px;margin-left:36px}
+
+/* ── PROSE ── */
+.prose{font-size:13px;color:var(--text2);line-height:1.85;margin-bottom:14px;font-weight:300}
+.prose strong{color:var(--text);font-weight:600}
+.prose code{font-family:var(--mono);font-size:11px;background:var(--bg2);padding:1px 5px;border-radius:3px;color:var(--text2)}
+.prose em{color:var(--blue);font-style:normal;font-weight:500}
+
+/* ── CARD ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.card-dot{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+
+/* ── CALLOUT ── */
+.callout{padding:12px 16px;border-radius:8px;border-left:3px solid;font-size:12px;line-height:1.7;margin:12px 0;font-weight:300}
+.callout strong{font-weight:600}
+.c-blue{background:var(--blue-lt);border-color:var(--blue);color:#1a3a8a}
+.c-amber{background:var(--amber-lt);border-color:var(--amber);color:#6b3c00}
+.c-teal{background:var(--teal-lt);border-color:var(--teal);color:#054038}
+.c-red{background:var(--red-lt);border-color:var(--red);color:#7a0f0f}
+.c-green{background:var(--green-lt);border-color:var(--green);color:#0a3d1c}
+.c-purple{background:var(--purple-lt);border-color:var(--purple);color:#36148a}
+
+/* ── HIGHLIGHT ── */
+.hl{border-left:3px solid var(--blue);padding:12px 16px;background:var(--blue-lt);border-radius:0 8px 8px 0;margin:12px 0;font-size:13px;color:#1a3a8a;font-weight:300;line-height:1.7}
+.hl strong{font-weight:600}
+
+/* ── TERMS ── */
+.terms{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.term{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.term-name{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text);margin-bottom:3px}
+.term-def{font-size:11px;color:var(--text2);line-height:1.6;font-weight:300}
+@media(max-width:640px){.terms{grid-template-columns:1fr}}
+
+/* ── ROLE TABS ── */
+.role-tabs{display:flex;gap:2px;background:var(--bg2);padding:4px;border-radius:9px;border:1px solid var(--border);margin-bottom:20px;flex-wrap:wrap}
+.role-tab{flex:1;min-width:80px;padding:7px 10px;border-radius:6px;cursor:pointer;border:none;background:none;font-family:var(--font);font-size:11px;font-weight:500;color:var(--text3);transition:all .15s;text-align:center}
+.role-tab:hover{background:var(--white);color:var(--text2)}
+.role-tab.active{background:var(--white);color:var(--text);box-shadow:var(--shadow)}
+.role-panel{display:none}
+.role-panel.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ── KPI CARDS ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0}
+@media(max-width:640px){.kpi-grid{grid-template-columns:1fr 1fr}}
+.kpi-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-top:3px solid}
+.kpi-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.kpi-value{font-size:22px;font-weight:700;line-height:1;margin-bottom:4px;font-family:var(--mono)}
+.kpi-sub{font-size:10px;color:var(--text3);line-height:1.4}
+.kpi-badge{display:inline-block;font-size:9px;font-weight:600;padding:1px 6px;border-radius:8px;margin-top:6px;font-family:var(--mono)}
+
+/* ── DASHBOARD MOCKUP ── */
+.dash-frame{background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:14px 0;box-shadow:var(--shadow-md)}
+.dash-topbar{background:var(--text);padding:8px 16px;display:flex;align-items:center;gap:10px}
+.dash-dots{display:flex;gap:5px}
+.dash-dot{width:10px;height:10px;border-radius:50%}
+.dash-title{font-size:11px;font-weight:500;color:rgba(255,255,255,.6);margin-left:4px;font-family:var(--mono)}
+.dash-body{padding:16px}
+.dash-section-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.dash-metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+@media(max-width:580px){.dash-metric-row{grid-template-columns:repeat(2,1fr)}}
+.dash-metric{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px 12px;border-top:2px solid}
+.dm-label{font-size:9px;color:var(--text3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px}
+.dm-val{font-size:18px;font-weight:700;font-family:var(--mono);line-height:1}
+.dm-change{font-size:9px;margin-top:4px;font-family:var(--mono)}
+.positive{color:var(--green)}
+.negative{color:var(--red)}
+.dash-charts{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:16px}
+@media(max-width:580px){.dash-charts{grid-template-columns:1fr}}
+.dash-chart-box{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px}
+.dcb-title{font-size:10px;font-weight:600;color:var(--text2);margin-bottom:10px}
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:80px}
+.bar{flex:1;border-radius:3px 3px 0 0;min-width:8px;transition:opacity .2s;cursor:pointer}
+.bar:hover{opacity:.8}
+.bar-labels{display:flex;gap:4px;margin-top:4px}
+.bar-label{flex:1;font-size:8px;color:var(--text3);text-align:center;font-family:var(--mono)}
+.donut-wrap{display:flex;align-items:center;justify-content:center;padding:8px 0}
+.donut-legend{font-size:10px;margin-top:6px}
+.legend-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.dash-table{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.dt-head{display:grid;padding:7px 12px;background:var(--bg);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3)}
+.dt-row{display:grid;padding:8px 12px;border-top:1px solid var(--border);font-size:11px;align-items:center}
+.dt-row:hover{background:var(--bg)}
+.status-pill{font-size:9px;font-weight:600;padding:2px 7px;border-radius:8px;font-family:var(--mono)}
+
+/* ── DATA MODEL ── */
+.dm-diagram{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:20px;overflow-x:auto;margin:14px 0}
+.dm-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;margin:12px 0}
+.tbl th{padding:8px 12px;text-align:left;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:700;border-bottom:1px solid var(--border);background:var(--bg)}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text2);font-weight:300;line-height:1.55;vertical-align:top}
+.tbl td:first-child{color:var(--text);font-weight:500}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg)}
+
+/* ── ANTI-PATTERN ── */
+.anti{background:var(--red-lt);border:1px solid var(--red-md);border-radius:8px;padding:12px 16px;margin:10px 0}
+.anti-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--red);margin-bottom:6px}
+.anti-text{font-size:12px;color:#7a1a1a;line-height:1.65;font-weight:300}
+.anti-text code{font-family:var(--mono);background:rgba(220,48,48,.1);padding:1px 5px;border-radius:3px}
+.good{background:var(--green-lt);border:1px solid var(--green-md);border-radius:8px;padding:12px 16px;margin:10px 0}
+.good-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:6px}
+.good-text{font-size:12px;color:#0a3d1c;line-height:1.65;font-weight:300}
+.good-text code{font-family:var(--mono);background:rgba(26,138,66,.1);padding:1px 5px;border-radius:3px}
+
+/* ── STEPS ── */
+.steps{display:flex;flex-direction:column}
+.step{display:flex;gap:14px;position:relative}
+.step:not(:last-child) .step-line{position:absolute;left:13px;top:28px;bottom:-6px;width:1px;background:var(--border)}
+.step-num{width:26px;height:26px;border-radius:50%;border:1.5px solid;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mono);flex-shrink:0;background:var(--white);z-index:1;position:relative}
+.step-body{flex:1;padding-bottom:20px}
+.step-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.8}
+.step-desc{font-size:12px;color:var(--text2);line-height:1.65;font-weight:300}
+
+/* ── EXERCISE ── */
+.exercise{border:1px solid var(--amber-md);border-radius:10px;overflow:hidden;margin-bottom:14px;background:var(--white)}
+.ex-head{padding:10px 16px;background:var(--amber-lt);border-bottom:1px solid var(--amber-md);display:flex;align-items:center;gap:10px}
+.ex-badge{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--amber);background:var(--white);padding:2px 8px;border-radius:4px;border:1px solid var(--amber-md)}
+.ex-title{font-size:13px;font-weight:600;color:var(--text)}
+.ex-time{margin-left:auto;font-size:10px;font-family:var(--mono);color:var(--text3)}
+.ex-body{padding:16px 18px}
+.ex-body p{font-size:12px;color:var(--text2);line-height:1.75;margin-bottom:10px;font-weight:300}
+.ex-list{list-style:none;display:flex;flex-direction:column;gap:7px}
+.ex-list li{display:flex;gap:8px;font-size:12px;color:var(--text2);line-height:1.6;font-weight:300}
+.ex-list li::before{content:'→';color:var(--amber);flex-shrink:0;font-weight:700}
+
+/* ── QA TABLE ── */
+.qa-wrap{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:14px 0}
+.qa-row{display:grid;grid-template-columns:5fr 7fr;border-bottom:1px solid var(--border)}
+.qa-row:last-child{border-bottom:none}
+.qa-row:hover{background:var(--bg)}
+.qa-q{padding:11px 14px;font-size:12px;font-weight:500;color:var(--text);border-right:1px solid var(--border);background:rgba(0,0,0,.015)}
+.qa-a{padding:11px 14px;font-size:12px;color:var(--text2);line-height:1.6;font-weight:300}
+
+/* ── ANIM ── */
+.fade{opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease}
+.fade.show{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-head">
+    <div class="sb-phase">ERP Training · GĐ 4/5</div>
+    <div class="sb-title">Dashboard, KPI<br>&amp; Data Design</div>
+    <div class="sb-meta">2 ngày · 3 module</div>
+  </div>
+  <div class="nav-sec">
+    <span class="nav-sec-label">Nội dung</span>
+    <a class="nav-a active" href="#m41"><div class="nav-ic" style="background:var(--blue-lt)">📊</div>M4.1 KPI theo vai trò<span class="nav-tag">4.1</span></a>
+    <a class="nav-a" href="#m42"><div class="nav-ic" style="background:var(--teal-lt)">📋</div>M4.2 Báo cáo quản trị vs pháp lý<span class="nav-tag">4.2</span></a>
+    <a class="nav-a" href="#m43"><div class="nav-ic" style="background:var(--purple-lt)">🗄️</div>M4.3 Thiết kế Data Model<span class="nav-tag">4.3</span></a>
+    <a class="nav-a" href="#exercises"><div class="nav-ic" style="background:var(--amber-lt)">📝</div>Bài tập thực hành</a>
+    <a class="nav-a" href="#checklist"><div class="nav-ic" style="background:var(--green-lt)">✓</div>Kiểm tra kiến thức</a>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-sec">
+    <span class="nav-sec-label">Lộ trình</span>
+    <a class="nav-a done" href="erp-training-phase1.html"><div class="nav-ic" style="background:var(--green-lt);color:var(--green)">✓</div>GĐ 1 — Doanh nghiệp</a>
+    <a class="nav-a done" href="erp-training-phase2.html"><div class="nav-ic" style="background:var(--green-lt);color:var(--green)">✓</div>GĐ 2 — Module ERP</a>
+    <a class="nav-a done" href="erp-training-phase3.html"><div class="nav-ic" style="background:var(--green-lt);color:var(--green)">✓</div>GĐ 3 — Workflow</a>
+    <a class="nav-a active" href="#"><div class="nav-ic" style="background:var(--blue-lt);color:var(--blue)">4</div>GĐ 4 — Dashboard</a>
+    <a class="nav-a locked" href="#"><div class="nav-ic" style="background:var(--bg2)">5</div>GĐ 5 — Ứng dụng</a>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="bc"><span>ERP Training</span><span class="bc-sep">›</span><span>Giai đoạn 4</span><span class="bc-sep">›</span><span class="bc-cur" id="bc-cur">KPI theo vai trò</span></div>
+  <div class="prog-wrap"><span>Tiến độ</span><div class="prog-bar"><div class="prog-fill" id="pf"></div></div><span id="pt">0%</span></div>
+</div>
+
+<main class="main">
+<div class="content">
+
+<!-- PAGE HEADER -->
+<div class="pg-head fade">
+  <div class="phase-pill"><span style="width:6px;height:6px;border-radius:50%;background:var(--blue);display:inline-block"></span>Giai đoạn 4 / 5</div>
+  <h1>Dashboard, KPI<br>&amp; Data Design</h1>
+  <p class="pg-desc">Xây dashboard đẹp nhưng sai KPI thì không có giá trị. Giai đoạn này dạy kỹ sư chọn đúng metric cho đúng người dùng, hiểu sự khác biệt giữa báo cáo quản trị và pháp lý, và thiết kế data model để report chạy nhanh và đúng.</p>
+  <div class="meta-row">
+    <div class="meta-chip"><div class="m-dot" style="background:var(--blue)"></div>2 ngày học</div>
+    <div class="meta-chip"><div class="m-dot" style="background:var(--teal)"></div>3 module</div>
+    <div class="meta-chip"><div class="m-dot" style="background:var(--amber)"></div>Dashboard mockup tương tác</div>
+    <div class="meta-chip"><div class="m-dot" style="background:var(--purple)"></div>Data model thực tế</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     M4.1 — KPI THEO VAI TRÒ
+═══════════════════════════════════ -->
+<div class="section fade" id="m41">
+  <div class="sec-label">Module 4.1</div>
+  <div class="sec-head"><div class="sec-num">4.1</div><div class="sec-title">KPI theo từng vai trò</div></div>
+  <div class="sec-sub">CEO, Kế toán, Kho, Bán hàng — mỗi người cần nhìn vào một bộ số khác nhau</div>
+
+  <div class="hl">
+    <strong>Sai lầm kinh điển của kỹ sư:</strong> Xây một dashboard duy nhất cho tất cả mọi người, nhét đủ 20 biểu đồ vào. Kết quả: không ai dùng vì quá nhiễu. Nguyên tắc đúng là <strong>mỗi vai trò có một dashboard riêng</strong>, hiển thị đúng KPI mà vai trò đó chịu trách nhiệm và cần ra quyết định hàng ngày.
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="card-dot" style="background:var(--blue)"></div>Dashboard mẫu tương tác — chọn vai trò để xem KPI</div>
+    <p class="prose">Click vào từng vai trò bên dưới để xem dashboard mẫu và giải thích tại sao từng metric được chọn.</p>
+
+    <div class="role-tabs">
+      <button class="role-tab active" onclick="showRole('ceo',this)">👔 CEO / GĐ</button>
+      <button class="role-tab" onclick="showRole('kt',this)">📒 Kế toán</button>
+      <button class="role-tab" onclick="showRole('kho',this)">📦 Quản lý kho</button>
+      <button class="role-tab" onclick="showRole('sales',this)">💼 Trưởng bán hàng</button>
+      <button class="role-tab" onclick="showRole('mh',this)">🛒 Mua hàng</button>
+    </div>
+
+    <!-- CEO PANEL -->
+    <div class="role-panel active" id="role-ceo">
+      <div class="dash-frame">
+        <div class="dash-topbar">
+          <div class="dash-dots"><div class="dash-dot" style="background:#ff5f57"></div><div class="dash-dot" style="background:#febc2e"></div><div class="dash-dot" style="background:#28c840"></div></div>
+          <div class="dash-title">Executive Dashboard — Tháng 11/2024</div>
+        </div>
+        <div class="dash-body">
+          <div class="dash-section-title">Tổng quan kinh doanh</div>
+          <div class="dash-metric-row">
+            <div class="dash-metric" style="border-top-color:var(--blue)">
+              <div class="dm-label">Doanh thu tháng</div>
+              <div class="dm-val" style="color:var(--blue)">4.2<span style="font-size:12px">tỷ</span></div>
+              <div class="dm-change positive">↑ +12.4% so tháng trước</div>
+            </div>
+            <div class="dash-metric" style="border-top-color:var(--green)">
+              <div class="dm-label">Lợi nhuận gộp</div>
+              <div class="dm-val" style="color:var(--green)">38.5<span style="font-size:12px">%</span></div>
+              <div class="dm-change positive">↑ +1.2% so KH</div>
+            </div>
+            <div class="dash-metric" style="border-top-color:var(--amber)">
+              <div class="dm-label">Tiền mặt &amp; ngân hàng</div>
+              <div class="dm-val" style="color:var(--amber)">1.8<span style="font-size:12px">tỷ</span></div>
+              <div class="dm-change" style="color:var(--text3)">Đủ chi 24 ngày</div>
+            </div>
+            <div class="dash-metric" style="border-top-color:var(--red)">
+              <div class="dm-label">Công nợ quá hạn</div>
+              <div class="dm-val" style="color:var(--red)">340<span style="font-size:12px">tr</span></div>
+              <div class="dm-change negative">↑ 5 KH quá 60 ngày</div>
+            </div>
+          </div>
+          <div class="dash-charts">
+            <div class="dash-chart-box">
+              <div class="dcb-title">Doanh thu 6 tháng gần nhất (triệu đồng)</div>
+              <div class="bar-chart">
+                <div class="bar" style="height:55%;background:var(--blue-md)" title="T6: 3,200tr"></div>
+                <div class="bar" style="height:62%;background:var(--blue-md)" title="T7: 3,600tr"></div>
+                <div class="bar" style="height:48%;background:var(--blue-md)" title="T8: 2,800tr"></div>
+                <div class="bar" style="height:70%;background:var(--blue-md)" title="T9: 4,050tr"></div>
+                <div class="bar" style="height:66%;background:var(--blue-md)" title="T10: 3,740tr"></div>
+                <div class="bar" style="height:80%;background:var(--blue)" title="T11: 4,200tr"></div>
+              </div>
+              <div class="bar-labels">
+                <div class="bar-label">T6</div><div class="bar-label">T7</div><div class="bar-label">T8</div>
+                <div class="bar-label">T9</div><div class="bar-label">T10</div><div class="bar-label">T11</div>
+              </div>
+            </div>
+            <div class="dash-chart-box">
+              <div class="dcb-title">Doanh thu theo nhóm SP</div>
+              <div class="donut-wrap">
+                <svg viewBox="0 0 80 80" width="70" height="70">
+                  <circle cx="40" cy="40" r="28" fill="none" stroke="var(--blue)" stroke-width="14" stroke-dasharray="70 88" stroke-dashoffset="22"/>
+                  <circle cx="40" cy="40" r="28" fill="none" stroke="var(--teal-md)" stroke-width="14" stroke-dasharray="40 118" stroke-dashoffset="-48"/>
+                  <circle cx="40" cy="40" r="28" fill="none" stroke="var(--amber-md)" stroke-width="14" stroke-dasharray="30 128" stroke-dashoffset="-88"/>
+                  <circle cx="40" cy="40" r="28" fill="none" stroke="var(--red-md)" stroke-width="14" stroke-dasharray="18 140" stroke-dashoffset="-118"/>
+                </svg>
+              </div>
+              <div class="donut-legend">
+                <div class="legend-row"><div class="legend-dot" style="background:var(--blue)"></div><span style="font-size:9px;color:var(--text2)">SP nhóm A — 44%</span></div>
+                <div class="legend-row"><div class="legend-dot" style="background:var(--teal-md)"></div><span style="font-size:9px;color:var(--text2)">SP nhóm B — 25%</span></div>
+                <div class="legend-row"><div class="legend-dot" style="background:var(--amber-md)"></div><span style="font-size:9px;color:var(--text2)">SP nhóm C — 19%</span></div>
+                <div class="legend-row"><div class="legend-dot" style="background:var(--red-md)"></div><span style="font-size:9px;color:var(--text2)">Khác — 12%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="dash-section-title">Cảnh báo cần xử lý</div>
+          <div class="dash-table">
+            <div class="dt-head" style="grid-template-columns:2fr 1fr 1fr 1fr">
+              <div>Cảnh báo</div><div>Giá trị</div><div>Từ ngày</div><div>Ưu tiên</div>
+            </div>
+            <div class="dt-row" style="grid-template-columns:2fr 1fr 1fr 1fr">
+              <div>Công ty Hoàng Gia chưa thanh toán</div>
+              <div style="font-family:var(--mono);font-size:11px">185tr</div>
+              <div style="font-size:11px;color:var(--text3)">15/09</div>
+              <div><span class="status-pill" style="background:var(--red-lt);color:var(--red)">Cao</span></div>
+            </div>
+            <div class="dt-row" style="grid-template-columns:2fr 1fr 1fr 1fr">
+              <div>Tồn kho SP-001 dưới mức tối thiểu</div>
+              <div style="font-family:var(--mono);font-size:11px">12 cái</div>
+              <div style="font-size:11px;color:var(--text3)">Hôm nay</div>
+              <div><span class="status-pill" style="background:var(--amber-lt);color:var(--amber)">Trung bình</span></div>
+            </div>
+            <div class="dt-row" style="grid-template-columns:2fr 1fr 1fr 1fr">
+              <div>3 PO chờ duyệt quá 48 giờ</div>
+              <div style="font-family:var(--mono);font-size:11px">420tr</div>
+              <div style="font-size:11px;color:var(--text3)">2 ngày</div>
+              <div><span class="status-pill" style="background:var(--amber-lt);color:var(--amber)">Trung bình</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="callout c-blue"><strong>Tại sao CEO cần những số này?</strong> CEO không cần biết từng đơn hàng — họ cần biết xu hướng (revenue trend), sức khỏe tài chính (cash position, margin), và các rủi ro đang phát sinh (overdue AR, low stock crit items). Dashboard CEO phải load trong &lt;3 giây và không cần drill-down phức tạp.</div>
+    </div>
+
+    <!-- KẾ TOÁN PANEL -->
+    <div class="role-panel" id="role-kt">
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-top-color:var(--red)">
+          <div class="kpi-label">AR quá hạn</div>
+          <div class="kpi-value" style="color:var(--red)">892<span style="font-size:14px">tr</span></div>
+          <div class="kpi-sub">Phân theo dải: 0-30, 31-60, >60 ngày</div>
+          <span class="kpi-badge" style="background:var(--red-lt);color:var(--red)">Cần xử lý ngay</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--amber)">
+          <div class="kpi-label">AP sắp đến hạn (7 ngày)</div>
+          <div class="kpi-value" style="color:var(--amber)">340<span style="font-size:14px">tr</span></div>
+          <div class="kpi-sub">12 hóa đơn NCC chờ thanh toán</div>
+          <span class="kpi-badge" style="background:var(--amber-lt);color:var(--amber)">Chuẩn bị tiền</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--blue)">
+          <div class="kpi-label">Journal entries chưa duyệt</div>
+          <div class="kpi-value" style="color:var(--blue)">7</div>
+          <div class="kpi-sub">Cần review trước khi chốt sổ</div>
+          <span class="kpi-badge" style="background:var(--blue-lt);color:var(--blue)">Cần duyệt</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--green)">
+          <div class="kpi-label">Doanh thu chưa xuất HĐ</div>
+          <div class="kpi-value" style="color:var(--green)">128<span style="font-size:14px">tr</span></div>
+          <div class="kpi-sub">Hàng đã giao nhưng chưa có invoice</div>
+          <span class="kpi-badge" style="background:var(--green-lt);color:var(--green)">Cần xuất HĐ</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--purple)">
+          <div class="kpi-label">Thuế VAT phải nộp (tháng)</div>
+          <div class="kpi-value" style="color:var(--purple)">42<span style="font-size:14px">tr</span></div>
+          <div class="kpi-sub">Hạn nộp: ngày 20 tháng sau</div>
+          <span class="kpi-badge" style="background:var(--purple-lt);color:var(--purple)">Còn 8 ngày</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--teal)">
+          <div class="kpi-label">Số dư cuối ngày</div>
+          <div class="kpi-value" style="color:var(--teal)">1.84<span style="font-size:14px">tỷ</span></div>
+          <div class="kpi-sub">Ngân hàng + tiền mặt quỹ</div>
+          <span class="kpi-badge" style="background:var(--teal-lt);color:var(--teal)">Cập nhật 9:00</span>
+        </div>
+      </div>
+      <div class="callout c-teal"><strong>KPI của kế toán tập trung vào thời hạn và sự cân đối:</strong> Họ cần biết ai đang nợ mình (AR aging), mình nợ ai sắp phải trả (AP schedule), sổ sách có đúng không (unposted entries), và đủ tiền hoạt động không (cash balance). Đây là dashboard hàng ngày, cập nhật real-time.</div>
+    </div>
+
+    <!-- KHO PANEL -->
+    <div class="role-panel" id="role-kho">
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-top-color:var(--red)">
+          <div class="kpi-label">Sản phẩm dưới mức tối thiểu</div>
+          <div class="kpi-value" style="color:var(--red)">8</div>
+          <div class="kpi-sub">Cần đặt hàng bổ sung ngay</div>
+          <span class="kpi-badge" style="background:var(--red-lt);color:var(--red)">Hết hàng nguy cơ cao</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--amber)">
+          <div class="kpi-label">Lệnh xuất kho chờ xử lý</div>
+          <div class="kpi-value" style="color:var(--amber)">23</div>
+          <div class="kpi-sub">Delivery Order chưa pick &amp; pack</div>
+          <span class="kpi-badge" style="background:var(--amber-lt);color:var(--amber)">Hôm nay cần giao 15</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--blue)">
+          <div class="kpi-label">Tổng giá trị tồn kho</div>
+          <div class="kpi-value" style="color:var(--blue)">2.6<span style="font-size:14px">tỷ</span></div>
+          <div class="kpi-sub">Theo giá AVG tại thời điểm hiện tại</div>
+          <span class="kpi-badge" style="background:var(--blue-lt);color:var(--blue)">Cập nhật real-time</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--purple)">
+          <div class="kpi-label">Hàng sắp hết hạn (30 ngày)</div>
+          <div class="kpi-value" style="color:var(--purple)">14</div>
+          <div class="kpi-sub">Lô hàng cần xử lý trước khi hết hạn</div>
+          <span class="kpi-badge" style="background:var(--purple-lt);color:var(--purple)">Cần ưu tiên bán</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--green)">
+          <div class="kpi-label">Tỷ lệ giao đúng hạn</div>
+          <div class="kpi-value" style="color:var(--green)">96.2<span style="font-size:14px">%</span></div>
+          <div class="kpi-sub">On-time delivery rate tháng này</div>
+          <span class="kpi-badge" style="background:var(--green-lt);color:var(--green)">KPI tốt &gt;95%</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--teal)">
+          <div class="kpi-label">Hàng nhập chờ kiểm tra QC</div>
+          <div class="kpi-value" style="color:var(--teal)">4</div>
+          <div class="kpi-sub">GRN đang ở trạng thái Quarantine</div>
+          <span class="kpi-badge" style="background:var(--teal-lt);color:var(--teal)">Cần kiểm tra hôm nay</span>
+        </div>
+      </div>
+      <div class="callout c-teal"><strong>Quản lý kho cần biết trạng thái thực tế ngay lúc này:</strong> Hàng gì đang thiếu, hàng gì cần giao gấp, hàng gì sắp hết hạn. Mọi số liệu phải là real-time, không phải báo cáo hàng ngày vì kho hoạt động theo giờ, không theo ngày.</div>
+    </div>
+
+    <!-- SALES PANEL -->
+    <div class="role-panel" id="role-sales">
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-top-color:var(--blue)">
+          <div class="kpi-label">Doanh thu tháng / Chỉ tiêu</div>
+          <div class="kpi-value" style="color:var(--blue)">78<span style="font-size:14px">%</span></div>
+          <div class="kpi-sub">3.9 tỷ / 5 tỷ KH tháng này</div>
+          <span class="kpi-badge" style="background:var(--amber-lt);color:var(--amber)">Còn 8 ngày</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--amber)">
+          <div class="kpi-label">Đơn hàng chưa xử lý</div>
+          <div class="kpi-value" style="color:var(--amber)">12</div>
+          <div class="kpi-sub">SO đã confirm, chờ kho xác nhận giao</div>
+          <span class="kpi-badge" style="background:var(--amber-lt);color:var(--amber)">Theo dõi sát</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--green)">
+          <div class="kpi-label">Tỷ lệ chuyển đổi Quotation</div>
+          <div class="kpi-value" style="color:var(--green)">34<span style="font-size:14px">%</span></div>
+          <div class="kpi-sub">34 SO / 100 Quotation tháng này</div>
+          <span class="kpi-badge" style="background:var(--green-lt);color:var(--green)">Tốt hơn tháng trước</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--teal)">
+          <div class="kpi-label">Giá trị đơn hàng trung bình</div>
+          <div class="kpi-value" style="color:var(--teal)">42<span style="font-size:14px">tr</span></div>
+          <div class="kpi-sub">Average order value tháng này</div>
+          <span class="kpi-badge" style="background:var(--teal-lt);color:var(--teal)">↑ +8% so tháng trước</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--red)">
+          <div class="kpi-label">Top 5 KH có nợ quá hạn</div>
+          <div class="kpi-value" style="color:var(--red)">5</div>
+          <div class="kpi-sub">Cần sales gọi nhắc nợ</div>
+          <span class="kpi-badge" style="background:var(--red-lt);color:var(--red)">Phối hợp KT</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--purple)">
+          <div class="kpi-label">Pipeline (Quotation đang mở)</div>
+          <div class="kpi-value" style="color:var(--purple)">28</div>
+          <div class="kpi-sub">Giá trị tiềm năng: 1.4 tỷ</div>
+          <span class="kpi-badge" style="background:var(--purple-lt);color:var(--purple)">Theo dõi follow-up</span>
+        </div>
+      </div>
+      <div class="callout c-blue"><strong>Trưởng bán hàng cần số liệu để quản lý team và dự báo:</strong> % hoàn thành chỉ tiêu, pipeline, tỷ lệ chuyển đổi, và danh sách khách cần chăm sóc (nợ quá hạn, đơn chờ lâu). Dashboard này giúp họ quyết định hàng ngày: gọi cho ai, đẩy deal nào.</div>
+    </div>
+
+    <!-- MUA HÀNG PANEL -->
+    <div class="role-panel" id="role-mh">
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-top-color:var(--amber)">
+          <div class="kpi-label">PR chờ xử lý (tạo PO)</div>
+          <div class="kpi-value" style="color:var(--amber)">9</div>
+          <div class="kpi-sub">Yêu cầu mua đã duyệt, chưa đặt NCC</div>
+          <span class="kpi-badge" style="background:var(--amber-lt);color:var(--amber)">Cần đặt hàng hôm nay</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--red)">
+          <div class="kpi-label">PO trễ hạn giao (quá lead time)</div>
+          <div class="kpi-value" style="color:var(--red)">3</div>
+          <div class="kpi-sub">NCC chưa giao theo cam kết</div>
+          <span class="kpi-badge" style="background:var(--red-lt);color:var(--red)">Cần đốc thúc NCC</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--blue)">
+          <div class="kpi-label">Chi phí mua hàng tháng</div>
+          <div class="kpi-value" style="color:var(--blue)">2.4<span style="font-size:14px">tỷ</span></div>
+          <div class="kpi-sub">So ngân sách: đang ở 91% kế hoạch</div>
+          <span class="kpi-badge" style="background:var(--blue-lt);color:var(--blue)">Trong ngân sách</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--green)">
+          <div class="kpi-label">Tiết kiệm so giá thị trường</div>
+          <div class="kpi-value" style="color:var(--green)">3.2<span style="font-size:14px">%</span></div>
+          <div class="kpi-sub">Cost savings vs last purchase price</div>
+          <span class="kpi-badge" style="background:var(--green-lt);color:var(--green)">KPI mua hàng quan trọng</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--purple)">
+          <div class="kpi-label">Hóa đơn NCC chờ 3-way match</div>
+          <div class="kpi-value" style="color:var(--purple)">7</div>
+          <div class="kpi-sub">Cần đối chiếu trước khi duyệt thanh toán</div>
+          <span class="kpi-badge" style="background:var(--purple-lt);color:var(--purple)">Cần xử lý</span>
+        </div>
+        <div class="kpi-card" style="border-top-color:var(--teal)">
+          <div class="kpi-label">Đánh giá NCC trung bình</div>
+          <div class="kpi-value" style="color:var(--teal)">4.1<span style="font-size:14px">/5</span></div>
+          <div class="kpi-sub">Dựa trên on-time + quality score</div>
+          <span class="kpi-badge" style="background:var(--teal-lt);color:var(--teal)">Tháng này</span>
+        </div>
+      </div>
+      <div class="callout c-teal"><strong>Mua hàng cần theo dõi nhà cung cấp và ngân sách:</strong> PO nào đang trễ, NCC nào không uy tín, ngân sách còn bao nhiêu, và việc xử lý hóa đơn có kịp không. KPI tiết kiệm chi phí (cost savings) là KPI quan trọng để đánh giá hiệu quả của team mua hàng.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="card-dot" style="background:var(--blue)"></div>Nguyên tắc thiết kế dashboard đúng</div>
+    <table class="tbl">
+      <thead><tr><th>Nguyên tắc</th><th>Giải thích</th><th>Sai lầm thường gặp</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>1 dashboard — 1 vai trò</td>
+          <td>Mỗi loại người dùng có dashboard riêng, chứa đúng những số họ chịu trách nhiệm</td>
+          <td>Một dashboard cho tất cả — quá nhiều thông tin, không ai dùng</td>
+        </tr>
+        <tr>
+          <td>Metric hành động được (Actionable)</td>
+          <td>Mỗi KPI phải dẫn đến một hành động cụ thể khi nó vượt ngưỡng. AR >90 ngày → gọi điện cho khách</td>
+          <td>Số liệu thú vị nhưng không có ngưỡng cảnh báo, không ai biết khi nào cần làm gì</td>
+        </tr>
+        <tr>
+          <td>Ngưỡng cảnh báo (Threshold)</td>
+          <td>Mỗi KPI có 3 vùng: Xanh (tốt), Vàng (cần theo dõi), Đỏ (cần xử lý ngay). Cấu hình được bởi admin</td>
+          <td>Hard-code threshold — thay đổi phải sửa code</td>
+        </tr>
+        <tr>
+          <td>Thời gian cập nhật rõ ràng</td>
+          <td>Người dùng phải biết số liệu này fresh đến mức nào: real-time, 15 phút, hàng ngày, hàng tháng</td>
+          <td>Không ghi thời gian cập nhật — người dùng không biết có thể tin vào số liệu không</td>
+        </tr>
+        <tr>
+          <td>Drill-down có mục đích</td>
+          <td>Click vào KPI "23 đơn hàng chưa xử lý" → xem ngay danh sách 23 đơn đó với đầy đủ thông tin cần thiết</td>
+          <td>Drill-down chỉ hiển thị thêm số liệu tổng hợp, không đến được bản ghi chi tiết</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     M4.2 — BÁO CÁO QUẢN TRỊ vs PHÁP LÝ
+═══════════════════════════════════ -->
+<div class="section fade" id="m42">
+  <div class="sec-label">Module 4.2</div>
+  <div class="sec-head"><div class="sec-num">4.2</div><div class="sec-title">Báo cáo quản trị vs Báo cáo pháp lý</div></div>
+  <div class="sec-sub">Hai loại báo cáo hoàn toàn khác nhau — kỹ sư phải thiết kế riêng</div>
+
+  <div class="card">
+    <div class="card-title"><div class="card-dot" style="background:var(--teal)"></div>So sánh chi tiết hai loại báo cáo</div>
+    <table class="tbl">
+      <thead><tr><th>Tiêu chí</th><th>Báo cáo quản trị (Internal)</th><th>Báo cáo pháp lý (Statutory)</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Mục đích</td>
+          <td>Hỗ trợ ra quyết định kinh doanh nội bộ</td>
+          <td>Tuân thủ pháp luật, nộp cho cơ quan nhà nước</td>
+        </tr>
+        <tr>
+          <td>Người nhận</td>
+          <td>CEO, GĐ, Trưởng bộ phận</td>
+          <td>Cục thuế, cơ quan BHXH, kiểm toán độc lập</td>
+        </tr>
+        <tr>
+          <td>Tần suất</td>
+          <td>Real-time, hàng ngày, hàng tuần, hàng tháng</td>
+          <td>Hàng tháng (thuế), hàng quý, hàng năm (kiểm toán)</td>
+        </tr>
+        <tr>
+          <td>Định dạng</td>
+          <td>Linh hoạt: dashboard, chart, pivot table, xuất Excel</td>
+          <td>Cố định theo mẫu quy định (Thông tư 133, 200, mẫu hóa đơn GTGT)</td>
+        </tr>
+        <tr>
+          <td>Tính chính xác</td>
+          <td>Gần đúng được chấp nhận nếu tốc độ quan trọng hơn</td>
+          <td>Phải chính xác tuyệt đối, có dấu, có chữ ký, không được sửa sau khi nộp</td>
+        </tr>
+        <tr>
+          <td>Điều chỉnh sau khi xuất</td>
+          <td>Được — người dùng tự lọc, pivot, thay đổi tham số</td>
+          <td>Không — phải làm báo cáo bổ sung, giải trình riêng</td>
+        </tr>
+        <tr>
+          <td>Ví dụ</td>
+          <td>Dashboard doanh thu theo tuần, Phân tích margin theo sản phẩm, Báo cáo tồn kho theo ngày</td>
+          <td>Tờ khai thuế GTGT, Báo cáo tài chính năm, Báo cáo BHXH hàng tháng, Hóa đơn điện tử</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout c-amber">
+      <strong>Hệ quả thiết kế:</strong> Báo cáo quản trị cần engine linh hoạt (filter, group by, date range tùy ý). Báo cáo pháp lý cần engine cứng — chạy đúng template, khóa lại sau khi in, lưu lịch sử mỗi lần xuất báo cáo. Hai loại nên có kiến trúc riêng, không nên dùng chung một query layer.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="card-dot" style="background:var(--teal)"></div>Các báo cáo pháp lý bắt buộc tại Việt Nam</div>
+    <table class="tbl">
+      <thead><tr><th>Loại báo cáo</th><th>Chu kỳ</th><th>Nộp cho</th><th>Kỹ sư cần lưu ý</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Tờ khai thuế GTGT</td>
+          <td>Hàng tháng (trước ngày 20)</td>
+          <td>Cục thuế (eTax)</td>
+          <td>Dữ liệu từ hóa đơn đầu ra (VAT thu) và đầu vào (VAT khấu trừ). Phân biệt VAT 0%, 5%, 10%.</td>
+        </tr>
+        <tr>
+          <td>Báo cáo BHXH</td>
+          <td>Hàng tháng (trước ngày 31)</td>
+          <td>Cơ quan BHXH</td>
+          <td>Dữ liệu từ bảng lương: lương đóng BHXH có thể khác lương gross. Cần trường riêng.</td>
+        </tr>
+        <tr>
+          <td>Quyết toán thuế TNCN</td>
+          <td>Hàng năm (trước 31/03 năm sau)</td>
+          <td>Cục thuế</td>
+          <td>Tổng hợp thu nhập + giảm trừ cả năm. Cần lưu đủ từng tháng để quyết toán năm.</td>
+        </tr>
+        <tr>
+          <td>Báo cáo tài chính năm</td>
+          <td>Hàng năm (trước 31/03 năm sau)</td>
+          <td>Sở KH-ĐT, kiểm toán</td>
+          <td>Balance Sheet, P&amp;L, Cash Flow, thuyết minh. Phải theo chuẩn VAS (Thông tư 200 hoặc 133).</td>
+        </tr>
+        <tr>
+          <td>Hóa đơn điện tử</td>
+          <td>Mỗi khi xuất hóa đơn</td>
+          <td>Cơ quan thuế (CQT) xác thực mã</td>
+          <td>Tích hợp với nhà cung cấp hóa đơn điện tử (MISA, VIETTEL, FPT...). Cần API &amp; trạng thái xác thực.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     M4.3 — THIẾT KẾ DATA MODEL
+═══════════════════════════════════ -->
+<div class="section fade" id="m43">
+  <div class="sec-label">Module 4.3</div>
+  <div class="sec-head"><div class="sec-num">4.3</div><div class="sec-title">Thiết kế Data Model cho ERP Reporting</div></div>
+  <div class="sec-sub">Dữ liệu đúng ngay từ đầu — không phải patch sau khi report chạy sai</div>
+
+  <div class="hl">
+    <strong>Vấn đề thực tế:</strong> Kỹ sư xây ERP với schema chỉ phục vụ CRUD. Đến khi khách hàng yêu cầu "cho tôi xem doanh thu theo vùng, theo nhân viên, theo tháng, so sánh với năm trước" — phải query join 8 bảng, chạy 30 giây, không thể dùng được. Bài học: thiết kế data model phải nghĩ đến reporting ngay từ ngày đầu.
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="card-dot" style="background:var(--purple)"></div>Document Model — Pattern đúng cho ERP</div>
+    <p class="prose">Trong ERP, tất cả giao dịch đều theo <strong>Document Pattern</strong>: có một bảng header (master) và một bảng lines (detail). Không bao giờ gộp vào một bảng phẳng.</p>
+
+    <div class="dm-diagram">
+      <div class="dm-label">Cấu trúc Sales Order — Document Pattern</div>
+      <svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="dm-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M1 1L9 5L1 9" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+        </defs>
+
+        <!-- SO Header -->
+        <rect x="20" y="20" width="280" height="230" rx="8" fill="var(--blue-lt)" stroke="var(--blue-md)" stroke-width="1"/>
+        <rect x="20" y="20" width="280" height="32" rx="8 8 0 0" fill="var(--blue)" />
+        <text x="30" y="41" font-family="'Plus Jakarta Sans'" font-size="11" font-weight="700" fill="white">sale_orders (Header)</text>
+
+        <text x="30" y="68" font-family="'JetBrains Mono'" font-size="10" fill="#1a3a8a">id              BIGINT PK</text>
+        <text x="30" y="84" font-family="'JetBrains Mono'" font-size="10" fill="#1a3a8a">so_number       VARCHAR</text>
+        <text x="30" y="100" font-family="'JetBrains Mono'" font-size="10" fill="#1a3a8a">customer_id     FK</text>
+        <text x="30" y="116" font-family="'JetBrains Mono'" font-size="10" fill="#1a3a8a">order_date      DATE</text>
+        <text x="30" y="132" font-family="'JetBrains Mono'" font-size="10" fill="#1a3a8a">delivery_date   DATE</text>
+        <text x="30" y="148" font-family="'JetBrains Mono'" font-size="10" fill="#1a3a8a">status          ENUM</text>
+        <text x="30" y="164" font-family="'JetBrains Mono'" font-size="10" fill="#6b7280">  ↳ draft/confirmed/done</text>
+        <text x="30" y="180" font-family="'JetBrains Mono'" font-size="10" fill="#6b7280">  ↳ /cancelled</text>
+        <text x="30" y="196" font-family="'JetBrains Mono'" font-size="10" fill="#1a3a8a">salesperson_id  FK</text>
+        <text x="30" y="212" font-family="'JetBrains Mono'" font-size="10" fill="#1a3a8a">pricelist_id    FK</text>
+        <text x="30" y="228" font-family="'JetBrains Mono'" font-size="10" fill="#1a3a8a">note            TEXT</text>
+
+        <!-- Arrow 1:N -->
+        <line x1="300" y1="135" x2="360" y2="135" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#dm-arr)"/>
+        <text x="310" y="128" font-family="'Plus Jakarta Sans'" font-size="9" fill="#9ca3af">1 : N</text>
+
+        <!-- SO Lines -->
+        <rect x="360" y="20" width="270" height="230" rx="8" fill="var(--teal-lt)" stroke="var(--teal-md)" stroke-width="1"/>
+        <rect x="360" y="20" width="270" height="32" rx="8 8 0 0" fill="var(--teal)" />
+        <text x="370" y="41" font-family="'Plus Jakarta Sans'" font-size="11" font-weight="700" fill="white">sale_order_lines (Lines)</text>
+
+        <text x="370" y="68" font-family="'JetBrains Mono'" font-size="10" fill="#054038">id              BIGINT PK</text>
+        <text x="370" y="84" font-family="'JetBrains Mono'" font-size="10" fill="#054038">order_id        FK → sale_orders</text>
+        <text x="370" y="100" font-family="'JetBrains Mono'" font-size="10" fill="#054038">product_id      FK</text>
+        <text x="370" y="116" font-family="'JetBrains Mono'" font-size="10" fill="#054038">qty_ordered     DECIMAL</text>
+        <text x="370" y="132" font-family="'JetBrains Mono'" font-size="10" fill="#054038">qty_delivered   DECIMAL</text>
+        <text x="370" y="148" font-family="'JetBrains Mono'" font-size="10" fill="#054038">unit_price      DECIMAL</text>
+        <text x="370" y="164" font-family="'JetBrains Mono'" font-size="10" fill="#054038">discount_pct    DECIMAL</text>
+        <text x="370" y="180" font-family="'JetBrains Mono'" font-size="10" fill="#054038">tax_id          FK</text>
+        <text x="370" y="196" font-family="'JetBrains Mono'" font-size="10" fill="#054038">subtotal        DECIMAL</text>
+        <text x="370" y="212" font-family="'JetBrains Mono'" font-size="10" fill="#6b7280">  ↳ computed: qty × price</text>
+        <text x="370" y="228" font-family="'JetBrains Mono'" font-size="10" fill="#6b7280">  ↳ × (1 - discount)</text>
+      </svg>
+    </div>
+
+    <div class="anti">
+      <div class="anti-label">Anti-pattern — Đừng làm thế này</div>
+      <div class="anti-text">Gộp tất cả vào một bảng <code>transactions</code> với cột <code>type = 'sale' | 'purchase' | 'inventory'</code>. Không thể query nhanh, không enforce constraints đúng loại, index không hiệu quả, và report phức tạp kinh khủng.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="card-dot" style="background:var(--purple)"></div>Dimensional Modeling — Cho báo cáo phân tích</div>
+    <p class="prose">Khi cần báo cáo phân tích (analytics) như "doanh thu theo tháng × theo sản phẩm × theo khu vực", schema chuẩn hóa (3NF) chạy rất chậm. Giải pháp: tạo thêm <strong>bảng fact và dimension</strong> riêng cho reporting.</p>
+
+    <div class="dm-diagram">
+      <div class="dm-label">Star Schema cho Sales Analytics</div>
+      <svg viewBox="0 0 720 300" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="star-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M1 1L9 5L1 9" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+        </defs>
+
+        <!-- Fact table (center) -->
+        <rect x="260" y="100" width="200" height="140" rx="8" fill="#fef5e4" stroke="var(--amber-md)" stroke-width="1.5"/>
+        <rect x="260" y="100" width="200" height="28" rx="8 8 0 0" fill="var(--amber)"/>
+        <text x="360" y="119" text-anchor="middle" font-family="'Plus Jakarta Sans'" font-size="11" font-weight="700" fill="white">fact_sales (Fact)</text>
+        <text x="270" y="144" font-family="'JetBrains Mono'" font-size="9" fill="#6b3c00">date_id     FK → dim_date</text>
+        <text x="270" y="158" font-family="'JetBrains Mono'" font-size="9" fill="#6b3c00">product_id  FK → dim_product</text>
+        <text x="270" y="172" font-family="'JetBrains Mono'" font-size="9" fill="#6b3c00">customer_id FK → dim_customer</text>
+        <text x="270" y="186" font-family="'JetBrains Mono'" font-size="9" fill="#6b3c00">employee_id FK → dim_employee</text>
+        <text x="270" y="206" font-family="'JetBrains Mono'" font-size="9" fill="#c97c0a" font-weight="500">revenue     DECIMAL (Measure)</text>
+        <text x="270" y="220" font-family="'JetBrains Mono'" font-size="9" fill="#c97c0a" font-weight="500">cost        DECIMAL (Measure)</text>
+        <text x="270" y="234" font-family="'JetBrains Mono'" font-size="9" fill="#c97c0a" font-weight="500">qty_sold    DECIMAL (Measure)</text>
+
+        <!-- dim_date (top) -->
+        <rect x="280" y="10" width="160" height="76" rx="7" fill="var(--blue-lt)" stroke="var(--blue-md)" stroke-width="1"/>
+        <text x="360" y="28" text-anchor="middle" font-family="'Plus Jakarta Sans'" font-size="10" font-weight="700" fill="var(--blue)">dim_date</text>
+        <text x="290" y="44" font-family="'JetBrains Mono'" font-size="9" fill="#1a3a8a">date_id, date, day, month</text>
+        <text x="290" y="58" font-family="'JetBrains Mono'" font-size="9" fill="#1a3a8a">quarter, year, weekday</text>
+        <text x="290" y="72" font-family="'JetBrains Mono'" font-size="9" fill="#6b7280">is_holiday, fiscal_period</text>
+        <line x1="360" y1="86" x2="360" y2="100" stroke="#cbd5e1" stroke-width="1" marker-end="url(#star-arr)"/>
+
+        <!-- dim_product (right) -->
+        <rect x="490" y="105" width="170" height="80" rx="7" fill="var(--teal-lt)" stroke="var(--teal-md)" stroke-width="1"/>
+        <text x="575" y="123" text-anchor="middle" font-family="'Plus Jakarta Sans'" font-size="10" font-weight="700" fill="var(--teal)">dim_product</text>
+        <text x="500" y="139" font-family="'JetBrains Mono'" font-size="9" fill="#054038">product_id, name</text>
+        <text x="500" y="153" font-family="'JetBrains Mono'" font-size="9" fill="#054038">category, brand</text>
+        <text x="500" y="167" font-family="'JetBrains Mono'" font-size="9" fill="#6b7280">unit, cost_price</text>
+        <line x1="490" y1="145" x2="460" y2="155" stroke="#cbd5e1" stroke-width="1" marker-end="url(#star-arr)"/>
+
+        <!-- dim_customer (bottom right) -->
+        <rect x="460" y="240" width="180" height="52" rx="7" fill="var(--purple-lt)" stroke="var(--purple-md)" stroke-width="1"/>
+        <text x="550" y="258" text-anchor="middle" font-family="'Plus Jakarta Sans'" font-size="10" font-weight="700" fill="var(--purple)">dim_customer</text>
+        <text x="470" y="274" font-family="'JetBrains Mono'" font-size="9" fill="#36148a">id, name, region, tier</text>
+        <text x="470" y="287" font-family="'JetBrains Mono'" font-size="9" fill="#6b7280">sales_channel, city</text>
+        <line x1="480" y1="240" x2="400" y2="225" stroke="#cbd5e1" stroke-width="1" marker-end="url(#star-arr)"/>
+
+        <!-- dim_employee (bottom left) -->
+        <rect x="60" y="240" width="180" height="52" rx="7" fill="var(--green-lt)" stroke="var(--green-md)" stroke-width="1"/>
+        <text x="150" y="258" text-anchor="middle" font-family="'Plus Jakarta Sans'" font-size="10" font-weight="700" fill="var(--green)">dim_employee</text>
+        <text x="70" y="274" font-family="'JetBrains Mono'" font-size="9" fill="#0a3d1c">id, name, department</text>
+        <text x="70" y="287" font-family="'JetBrains Mono'" font-size="9" fill="#6b7280">region, hire_date</text>
+        <line x1="230" y1="260" x2="290" y2="228" stroke="#cbd5e1" stroke-width="1" marker-end="url(#star-arr)"/>
+
+        <!-- Note -->
+        <text x="50" y="20" font-family="'Plus Jakarta Sans'" font-size="9" fill="#9ca3af">Fact table chứa measures (số đo).</text>
+        <text x="50" y="34" font-family="'Plus Jakarta Sans'" font-size="9" fill="#9ca3af">Dimension chứa attributes (thuộc tính).</text>
+        <text x="50" y="48" font-family="'Plus Jakarta Sans'" font-size="9" fill="#9ca3af">Query GROUP BY trên dim → nhanh.</text>
+      </svg>
+    </div>
+    <div class="callout c-purple">
+      <strong>Khi nào cần Star Schema?</strong> Khi số lượng records lớn (&gt;100k dòng) và cần báo cáo drill-down đa chiều. Đối với SMB nhỏ, có thể bắt đầu với schema chuẩn hóa và chuyển sang star schema sau nếu cần. Quan trọng là thiết kế sẵn các cột dimension (category, region, month...) ngay từ đầu.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="card-dot" style="background:var(--purple)"></div>Các trường dữ liệu hay bị bỏ sót — gây khó khăn cho reporting</div>
+    <div class="terms">
+      <div class="term">
+        <div class="term-name">currency &amp; exchange_rate</div>
+        <div class="term-def">Nếu DN có giao dịch ngoại tệ. Lưu cả nguyên tệ lẫn VND tương đương tại ngày giao dịch — không tính lại sau.</div>
+      </div>
+      <div class="term">
+        <div class="term-name">fiscal_period / accounting_period</div>
+        <div class="term-def">Tháng kế toán có thể khác tháng dương lịch. Cần trường riêng để filter báo cáo theo kỳ kế toán chính xác.</div>
+      </div>
+      <div class="term">
+        <div class="term-name">cost_center / department_id</div>
+        <div class="term-def">Mọi chi phí (lương, mua hàng, chi phí vận hành) phải gán vào trung tâm chi phí để báo cáo P&amp;L theo bộ phận.</div>
+      </div>
+      <div class="term">
+        <div class="term-name">created_at vs confirmed_at vs posted_at</div>
+        <div class="term-def">Ba thời điểm khác nhau: tạo document, xác nhận nghiệp vụ, ghi sổ kế toán. Cần lưu cả 3 để report đúng theo kỳ.</div>
+      </div>
+      <div class="term">
+        <div class="term-name">salesperson_id trên đơn hàng</div>
+        <div class="term-def">Để tính hoa hồng và phân tích hiệu quả theo nhân viên bán hàng. Thiếu trường này không tính được commission.</div>
+      </div>
+      <div class="term">
+        <div class="term-name">source / channel</div>
+        <div class="term-def">Đơn hàng đến từ kênh nào: trực tiếp, online, đại lý, telesales. Thiếu trường này không phân tích được hiệu quả từng kênh.</div>
+      </div>
+    </div>
+
+    <div class="anti">
+      <div class="anti-label">Lỗi phổ biến nhất về dữ liệu</div>
+      <div class="anti-text">Lưu tổng tiền như một con số duy nhất (<code>total = 5,450,000</code>) mà không lưu breakdown. Sau này không biết VAT bao nhiêu, chiết khấu bao nhiêu, phí vận chuyển bao nhiêu. Rule: <strong>luôn lưu các thành phần, tính tổng khi hiển thị</strong>.</div>
+    </div>
+    <div class="good">
+      <div class="good-label">Cách đúng</div>
+      <div class="good-text">Lưu: <code>subtotal</code>, <code>discount_amount</code>, <code>tax_amount</code>, <code>shipping_fee</code>, <code>total</code>. Tổng = subtotal − discount + tax + shipping. Từng thành phần có thể report riêng và đối chiếu.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="card-dot" style="background:var(--purple)"></div>Soft delete &amp; Audit trail — Bắt buộc trong ERP</div>
+    <p class="prose">ERP không bao giờ xóa dữ liệu thật sự. Mọi bản ghi cần 4 trường chuẩn và pattern audit log riêng:</p>
+    <div class="dm-diagram">
+      <div class="dm-label">Trường chuẩn cho mọi bảng trong ERP</div>
+      <svg viewBox="0 0 720 160" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="10" width="340" height="140" rx="8" fill="var(--bg)" stroke="var(--border2)" stroke-width="1"/>
+        <rect x="10" y="10" width="340" height="28" rx="8 8 0 0" fill="var(--text)"/>
+        <text x="20" y="28" font-family="'Plus Jakarta Sans'" font-size="11" font-weight="700" fill="white">Trường timestamp bắt buộc</text>
+        <text x="20" y="56" font-family="'JetBrains Mono'" font-size="10" fill="var(--text2)">created_at    TIMESTAMP WITH TZ</text>
+        <text x="20" y="72" font-family="'JetBrains Mono'" font-size="10" fill="var(--text2)">created_by    FK → users</text>
+        <text x="20" y="88" font-family="'JetBrains Mono'" font-size="10" fill="var(--text2)">updated_at    TIMESTAMP WITH TZ</text>
+        <text x="20" y="104" font-family="'JetBrains Mono'" font-size="10" fill="var(--text2)">updated_by    FK → users</text>
+        <text x="20" y="120" font-family="'JetBrains Mono'" font-size="10" fill="var(--red)">deleted_at    TIMESTAMP (NULL = active)</text>
+        <text x="20" y="136" font-family="'JetBrains Mono'" font-size="10" fill="var(--red)">deleted_by    FK → users (NULL = active)</text>
+
+        <rect x="370" y="10" width="340" height="140" rx="8" fill="var(--bg)" stroke="var(--border2)" stroke-width="1"/>
+        <rect x="370" y="10" width="340" height="28" rx="8 8 0 0" fill="var(--purple)"/>
+        <text x="380" y="28" font-family="'Plus Jakarta Sans'" font-size="11" font-weight="700" fill="white">Bảng audit_log riêng</text>
+        <text x="380" y="56" font-family="'JetBrains Mono'" font-size="10" fill="var(--text2)">id            BIGINT PK</text>
+        <text x="380" y="72" font-family="'JetBrains Mono'" font-size="10" fill="var(--text2)">table_name    VARCHAR</text>
+        <text x="380" y="88" font-family="'JetBrains Mono'" font-size="10" fill="var(--text2)">record_id     BIGINT</text>
+        <text x="380" y="104" font-family="'JetBrains Mono'" font-size="10" fill="var(--text2)">action        ENUM (create/update/delete)</text>
+        <text x="380" y="120" font-family="'JetBrains Mono'" font-size="10" fill="var(--purple)">old_values    JSONB</text>
+        <text x="380" y="136" font-family="'JetBrains Mono'" font-size="10" fill="var(--purple)">new_values    JSONB</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════
+     BÀI TẬP
+════════════════ -->
+<div class="section fade" id="exercises">
+  <div class="sec-label">Thực hành</div>
+  <div class="sec-head"><div class="sec-num" style="background:var(--amber-lt);border-color:var(--amber-md);color:var(--amber)">✎</div><div class="sec-title">Bài tập Giai đoạn 4</div></div>
+  <div class="sec-sub">3 bài tập — thiết kế, phân tích, và tự build dashboard mẫu</div>
+
+  <div class="exercise">
+    <div class="ex-head">
+      <div class="ex-badge">Bài 4.A</div>
+      <div class="ex-title">Thiết kế dashboard spec cho 3 vai trò</div>
+      <div class="ex-time">60 phút · nhóm 2 người</div>
+    </div>
+    <div class="ex-body">
+      <p>Cho một công ty thương mại nhỏ (30 nhân viên). Thiết kế <strong>Dashboard Specification</strong> — tài liệu mô tả dashboard trước khi code — cho 3 vai trò: Giám đốc, Kế toán trưởng, Trưởng kho.</p>
+      <ul class="ex-list">
+        <li>Mỗi dashboard: tên, đối tượng dùng, tần suất xem (realtime / daily / weekly).</li>
+        <li>Liệt kê 5–8 KPI với định nghĩa đầy đủ: tên metric, công thức tính, đơn vị, ngưỡng xanh/vàng/đỏ, nguồn dữ liệu từ bảng nào.</li>
+        <li>Vẽ wireframe đơn giản (tay hoặc Figma): vị trí các widget trên màn hình.</li>
+        <li>Xác định: KPI nào cần real-time query, KPI nào có thể cached theo giờ/ngày.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="ex-head">
+      <div class="ex-badge">Bài 4.B</div>
+      <div class="ex-title">Viết SQL queries cho AR Aging Report</div>
+      <div class="ex-time">45 phút · cá nhân</div>
+    </div>
+    <div class="ex-body">
+      <p>AR Aging Report là một trong những báo cáo quan trọng nhất của kế toán. Cho schema tối thiểu: <code>invoices(id, customer_id, invoice_date, due_date, total_amount)</code> và <code>payments(id, invoice_id, payment_date, amount)</code>. Viết SQL:</p>
+      <ul class="ex-list">
+        <li>Query tính <code>outstanding_amount</code> = total_amount − SUM(payments) cho từng invoice.</li>
+        <li>Query phân nhóm các invoice chưa thanh toán hết theo dải: Current (chưa đến hạn), 1–30 ngày quá hạn, 31–60, 61–90, &gt;90 ngày.</li>
+        <li>Query tổng hợp theo customer: tên khách, tổng nợ, breakdown theo 4 dải thời gian.</li>
+        <li>Bonus: Tính "Days Sales Outstanding" (DSO) = (AR balance / Total Revenue) × số ngày trong kỳ.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="ex-head">
+      <div class="ex-badge">Bài 4.C</div>
+      <div class="ex-title">Audit Data Model — Tìm lỗi thiết kế</div>
+      <div class="ex-time">30 phút · cá nhân</div>
+    </div>
+    <div class="ex-body">
+      <p>Cho schema sau của một ERP đang chạy thực tế. Tìm ít nhất <strong>8 vấn đề</strong> sẽ khiến báo cáo bị sai hoặc không làm được:</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:var(--mono);font-size:11px;color:var(--text2);line-height:1.8;margin:10px 0;">
+        orders(id, customer_name, product_name, quantity, price, total, date, status)<br>
+        payments(id, order_id, amount, paid)<br>
+        products(id, name, stock, cost)
+      </div>
+      <ul class="ex-list">
+        <li>Với mỗi vấn đề: mô tả vấn đề, hệ quả khi cần report, và cách sửa đúng.</li>
+        <li>Sau đó: thiết kế lại schema đúng cho cùng nghiệp vụ trên.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════
+     CHECKLIST
+════════════════ -->
+<div class="section fade" id="checklist">
+  <div class="sec-label">Kiểm tra</div>
+  <div class="sec-head"><div class="sec-num" style="background:var(--green-lt);border-color:var(--green-md);color:var(--green-700)">✓</div><div class="sec-title">Kiểm tra kiến thức trước khi qua Giai đoạn 5</div></div>
+  <div class="sec-sub">Trả lời được 5/6 → đủ điều kiện tiếp tục</div>
+
+  <div class="qa-wrap">
+    <div class="qa-row" style="background:var(--bg)">
+      <div class="qa-q" style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:700">Câu hỏi</div>
+      <div class="qa-a" style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:700">Câu trả lời kỳ vọng</div>
+    </div>
+    <div class="qa-row">
+      <div class="qa-q">Tại sao không nên xây một dashboard duy nhất cho tất cả mọi người?</div>
+      <div class="qa-a">Mỗi vai trò có trách nhiệm khác nhau và cần ra quyết định khác nhau. Dashboard chung quá nhiễu, không ai dùng. Mỗi role cần đúng KPI của mình, với ngưỡng cảnh báo phù hợp công việc hàng ngày của họ.</div>
+    </div>
+    <div class="qa-row">
+      <div class="qa-q">Báo cáo quản trị và báo cáo pháp lý khác nhau điểm gì quan trọng nhất?</div>
+      <div class="qa-a">Báo cáo pháp lý có định dạng cố định theo quy định nhà nước, không được sửa sau khi nộp, cần lưu lịch sử từng lần xuất. Báo cáo quản trị linh hoạt, người dùng có thể tự filter và pivot. Nên thiết kế hai engine riêng biệt.</div>
+    </div>
+    <div class="qa-row">
+      <div class="qa-q">Document Pattern trong ERP là gì? Tại sao quan trọng?</div>
+      <div class="qa-a">Mọi giao dịch có bảng Header (master) và bảng Lines (detail). Quan trọng vì: mỗi giao dịch có nhiều dòng hàng, constraint khác nhau ở 2 cấp, và query report cần aggregate lines nhóm theo header attributes.</div>
+    </div>
+    <div class="qa-row">
+      <div class="qa-q">Tại sao phải lưu riêng subtotal, tax_amount, discount_amount thay vì chỉ lưu total?</div>
+      <div class="qa-a">Vì báo cáo thuế cần tổng VAT, báo cáo chiết khấu cần tổng discount, phân tích margin cần biết cost vs revenue. Nếu chỉ lưu total, không thể tái hiện lại các thành phần và mọi báo cáo chi tiết sẽ không làm được.</div>
+    </div>
+    <div class="qa-row">
+      <div class="qa-q">KPI "Actionable" nghĩa là gì trong thiết kế dashboard?</div>
+      <div class="qa-a">Mỗi KPI khi vượt ngưỡng phải dẫn đến một hành động cụ thể mà người xem biết phải làm gì. VD: AR >90 ngày → gọi điện khách. Tồn kho dưới min → tạo PR. KPI chỉ đẹp mà không có next action thì vô ích.</div>
+    </div>
+    <div class="qa-row">
+      <div class="qa-q">Star Schema khác gì với schema chuẩn hóa (3NF) và khi nào dùng?</div>
+      <div class="qa-a">3NF tối ưu cho CRUD (ít duplicate, dễ update). Star schema có bảng Fact trung tâm + Dimension tables xung quanh — tối ưu cho analytical query (GROUP BY nhiều chiều, aggregation lớn). Dùng star schema khi dataset lớn và cần drill-down đa chiều nhanh.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;padding:18px 22px;background:var(--white);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow)">
+    <div style="flex:1">
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">Sẵn sàng cho Giai đoạn 5 — Giai đoạn cuối!</div>
+      <div style="font-size:12px;color:var(--text3);font-weight:300">Hoàn thành 3 bài tập + 5/6 câu hỏi → Workshop ứng dụng thực tế: thiết kế module ERP từ đầu</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:10px;font-family:var(--mono);color:var(--text3)">Tiếp theo</div>
+      <div style="font-size:12px;font-weight:700;color:var(--blue)">GĐ 5 — Ứng dụng<br>Workshop thực hành</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</main>
+
+<script>
+// Progress bar
+const pf=document.getElementById('pf'),pt=document.getElementById('pt');
+window.addEventListener('scroll',()=>{
+  const h=document.body.scrollHeight-window.innerHeight;
+  const p=Math.round(window.scrollY/h*100);
+  pf.style.width=p+'%'; pt.textContent=p+'%';
+});
+
+// Role tabs
+function showRole(id,btn){
+  document.querySelectorAll('.role-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.role-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('role-'+id).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('bc-cur').textContent = {
+    ceo:'CEO / Giám đốc',kt:'Kế toán',kho:'Quản lý kho',
+    sales:'Trưởng bán hàng',mh:'Mua hàng'
+  }[id]||'KPI theo vai trò';
+}
+
+// Scroll fade
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show');});
+},{threshold:0.05});
+document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+
+// Active nav
+const links=[...document.querySelectorAll('.sidebar .nav-a[href^="#"]')];
+const targets=links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean);
+window.addEventListener('scroll',()=>{
+  let cur='';
+  targets.forEach(t=>{if(window.scrollY>=t.offsetTop-130)cur='#'+t.id;});
+  links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')===cur));
+});
+</script>
+</body>
+</html>

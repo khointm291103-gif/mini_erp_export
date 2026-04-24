@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERP Training — Giai đoạn 5: Workshop Ứng Dụng Thực Hành</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --white:#ffffff;
+  --bg:#f9fafb;
+  --bg2:#f3f4f6;
+  --border:#e5e7eb;
+  --border2:#d1d5db;
+  --text:#111827;
+  --text2:#4b5563;
+  --text3:#9ca3af;
+  --blue:#2563eb;   --blue-lt:#eff6ff;  --blue-md:#bfdbfe;
+  --teal:#0d9488;   --teal-lt:#f0fdfa;  --teal-md:#99f6e4;
+  --amber:#d97706;  --amber-lt:#fffbeb; --amber-md:#fde68a;
+  --red:#dc2626;    --red-lt:#fef2f2;   --red-md:#fecaca;
+  --green:#16a34a;  --green-lt:#f0fdf4; --green-md:#bbf7d0;
+  --purple:#7c3aed; --purple-lt:#faf5ff;--purple-md:#ddd6fe;
+  --orange:#ea580c; --orange-lt:#fff7ed;--orange-md:#fed7aa;
+  --font:'Sora',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04);
+  --shadow-md:0 2px 8px rgba(0,0,0,.08),0 16px 40px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--white);color:var(--text);line-height:1.7;font-size:14px;font-weight:300}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:240px;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;z-index:100;padding-bottom:32px}
+.sb-head{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.sb-phase{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--blue);margin-bottom:3px}
+.sb-title{font-size:13px;font-weight:600;line-height:1.4}
+.sb-meta{font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)}
+.sb-complete{display:flex;align-items:center;gap:6px;margin-top:10px;padding:6px 10px;background:var(--green-lt);border:1px solid var(--green-md);border-radius:6px;font-size:10px;font-weight:600;color:var(--green)}
+.nav-sec{padding:12px 10px 4px}
+.nav-lbl{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:4px;display:block}
+.nav-a{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;font-size:12px;font-weight:400;color:var(--text2);text-decoration:none;transition:all .12s;cursor:pointer;border:none;background:none;width:100%;text-align:left}
+.nav-a:hover{background:var(--bg);color:var(--text)}
+.nav-a.active{background:var(--blue-lt);color:var(--blue);font-weight:600}
+.nav-a.done{color:var(--green);background:var(--green-lt)}
+.nav-ic{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.nav-sep{height:1px;background:var(--border);margin:6px 10px}
+
+/* ── TOPBAR ── */
+.topbar{position:fixed;left:240px;right:0;top:0;height:44px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;z-index:90}
+.bc{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.bc-sep{color:var(--border2)}
+.bc-cur{color:var(--text);font-weight:600}
+.topbar-badge{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--green);background:var(--green-lt);border:1px solid var(--green-md);padding:3px 10px;border-radius:20px}
+
+/* ── LAYOUT ── */
+.main{margin-left:240px;padding-top:44px}
+.content{max-width:900px;margin:0 auto;padding:44px 36px 100px}
+
+/* ── PAGE HEADER ── */
+.pg-head{margin-bottom:48px;padding-bottom:32px;border-bottom:2px solid var(--text)}
+.phase-strip{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.phase-num{width:40px;height:40px;background:var(--text);color:var(--white);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;font-family:var(--mono)}
+.phase-label-wrap{}
+.phase-label{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3)}
+.phase-name{font-size:13px;font-weight:600;color:var(--blue)}
+h1{font-size:34px;font-weight:700;line-height:1.18;letter-spacing:-.8px;color:var(--text);margin-bottom:12px}
+h1 .accent{color:var(--blue)}
+.pg-desc{font-size:14px;color:var(--text2);line-height:1.8;max-width:640px;font-weight:300}
+.meta-row{display:flex;gap:16px;margin-top:16px;flex-wrap:wrap}
+.meta-chip{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text3)}
+.m-dot{width:6px;height:6px;border-radius:50%}
+
+/* ── OVERVIEW CARDS ── */
+.overview-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}
+@media(max-width:640px){.overview-grid{grid-template-columns:1fr 1fr}}
+.ov-card{border:1px solid var(--border);border-radius:10px;padding:14px 16px;border-top:3px solid}
+.ov-num{font-size:28px;font-weight:700;line-height:1;font-family:var(--mono);margin-bottom:4px}
+.ov-label{font-size:11px;color:var(--text2);font-weight:400}
+.ov-sub{font-size:10px;color:var(--text3);margin-top:3px}
+
+/* ── SECTIONS ── */
+.section{margin-bottom:60px}
+.sec-label{display:flex;align-items:center;gap:10px;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--text3);margin-bottom:16px;margin-top:36px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sec-num{width:26px;height:26px;border-radius:6px;background:var(--blue-lt);border:1px solid var(--blue-md);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--blue);font-family:var(--mono);flex-shrink:0}
+.sec-title{font-size:18px;font-weight:700;color:var(--text)}
+.sec-sub{font-size:12px;color:var(--text3);margin-bottom:18px;margin-left:36px}
+
+/* ── PROSE ── */
+.prose{font-size:13px;color:var(--text2);line-height:1.85;margin-bottom:14px;font-weight:300}
+.prose strong{color:var(--text);font-weight:600}
+.prose code{font-family:var(--mono);font-size:11px;background:var(--bg2);padding:1px 5px;border-radius:3px;color:var(--text2)}
+.prose em{color:var(--blue);font-style:normal;font-weight:500}
+
+/* ── CARD ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.cd{width:7px;height:7px;border-radius:2px;flex-shrink:0}
+
+/* ── CALLOUT ── */
+.callout{padding:12px 16px;border-radius:8px;border-left:3px solid;font-size:12px;line-height:1.7;margin:12px 0;font-weight:300}
+.callout strong{font-weight:600}
+.c-blue{background:var(--blue-lt);border-color:var(--blue);color:#1e3a8a}
+.c-amber{background:var(--amber-lt);border-color:var(--amber);color:#78350f}
+.c-green{background:var(--green-lt);border-color:var(--green);color:#14532d}
+.c-teal{background:var(--teal-lt);border-color:var(--teal);color:#134e4a}
+.c-red{background:var(--red-lt);border-color:var(--red);color:#7f1d1d}
+
+/* ── WORKSHOP CARD ── */
+.workshop{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:24px;box-shadow:var(--shadow-md)}
+.ws-header{padding:20px 24px;display:flex;align-items:flex-start;gap:16px}
+.ws-num{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;font-family:var(--mono);flex-shrink:0;color:var(--white)}
+.ws-info{flex:1}
+.ws-tag{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.ws-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px}
+.ws-desc{font-size:12px;color:var(--text2);font-weight:300;line-height:1.6}
+.ws-meta{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+.ws-badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:6px;font-family:var(--mono)}
+.ws-body{padding:0 24px 24px}
+.ws-divider{height:1px;background:var(--border);margin:0 0 20px}
+
+/* ── SCENARIO ── */
+.scenario-box{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:16px}
+.scenario-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.scenario-text{font-size:13px;color:var(--text2);line-height:1.8;font-weight:300}
+.scenario-text strong{color:var(--text);font-weight:600}
+
+/* ── DELIVERABLES ── */
+.deliverables{background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.del-head{padding:10px 16px;background:var(--bg);border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.del-list{list-style:none}
+.del-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);transition:background .1s}
+.del-item:last-child{border-bottom:none}
+.del-item:hover{background:var(--bg)}
+.del-check{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;background:var(--white)}
+.del-check.checked{background:var(--green);border-color:var(--green)}
+.del-check.checked::after{content:'✓';color:white;font-size:11px;font-weight:700}
+.del-content{flex:1}
+.del-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.del-hint{font-size:11px;color:var(--text3);font-weight:300;line-height:1.5}
+.del-tag{display:inline-block;font-size:9px;font-weight:600;padding:1px 6px;border-radius:4px;margin-top:4px;font-family:var(--mono)}
+
+/* ── TIMELINE ── */
+.timeline{display:flex;flex-direction:column;gap:0;margin:16px 0}
+.tl-item{display:flex;gap:14px;position:relative}
+.tl-item:not(:last-child) .tl-line{position:absolute;left:15px;top:32px;bottom:-8px;width:1.5px;background:var(--border)}
+.tl-dot{width:30px;height:30px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mono);flex-shrink:0;background:var(--white);z-index:1;position:relative}
+.tl-body{flex:1;padding-bottom:20px}
+.tl-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.8}
+.tl-desc{font-size:12px;color:var(--text2);line-height:1.65;font-weight:300}
+.tl-time{font-size:10px;font-family:var(--mono);color:var(--text3);margin-top:4px}
+
+/* ── RUBRIC TABLE ── */
+.rubric{width:100%;border-collapse:collapse;font-size:12px;margin:12px 0}
+.rubric th{padding:8px 12px;text-align:left;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-weight:700;border-bottom:2px solid var(--border);background:var(--bg)}
+.rubric td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top;font-weight:300;color:var(--text2);line-height:1.55}
+.rubric td:first-child{font-weight:600;color:var(--text);font-size:13px}
+.rubric tr:last-child td{border-bottom:none}
+.rubric tr:hover td{background:var(--bg)}
+.score{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px}
+
+/* ── PROGRESS TRACKER ── */
+.progress-tracker{background:var(--white);border:2px solid var(--border);border-radius:14px;padding:24px;margin:20px 0;box-shadow:var(--shadow-md)}
+.pt-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.pt-sub{font-size:12px;color:var(--text3);margin-bottom:20px;font-weight:300}
+.pt-phases{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px}
+@media(max-width:560px){.pt-phases{grid-template-columns:1fr 1fr}}
+.pt-phase{border:1.5px solid var(--border);border-radius:10px;padding:12px 10px;text-align:center;transition:all .2s;cursor:pointer}
+.pt-phase.done{border-color:var(--green-md);background:var(--green-lt)}
+.pt-phase.current{border-color:var(--blue-md);background:var(--blue-lt);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.pt-phase-num{font-size:18px;font-weight:700;font-family:var(--mono);margin-bottom:3px}
+.pt-phase.done .pt-phase-num{color:var(--green)}
+.pt-phase.current .pt-phase-num{color:var(--blue)}
+.pt-phase-name{font-size:9px;font-weight:600;color:var(--text3);letter-spacing:.5px}
+.pt-phase.done .pt-phase-name{color:var(--green)}
+.pt-phase.current .pt-phase-name{color:var(--blue)}
+.pt-bar-wrap{margin-bottom:6px}
+.pt-bar-label{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:5px;font-family:var(--mono)}
+.pt-bar{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.pt-bar-fill{height:100%;border-radius:4px;background:var(--green);transition:width 1s ease}
+.pt-note{font-size:11px;color:var(--text3);text-align:center;margin-top:8px;font-weight:300}
+
+/* ── FINAL EXAM ── */
+.exam-card{border:2px solid var(--text);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.exam-head{padding:16px 24px;background:var(--text);display:flex;align-items:center;gap:12px}
+.exam-icon{font-size:22px}
+.exam-info{}
+.exam-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:2px}
+.exam-title{font-size:15px;font-weight:700;color:var(--white)}
+.exam-body{padding:20px 24px}
+.q-block{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-num{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);font-family:var(--mono);margin-bottom:6px}
+.q-text{font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.5}
+.q-hint{font-size:11px;color:var(--text3);font-weight:300;line-height:1.5}
+.q-answer{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:10px;font-size:12px;color:var(--text2);line-height:1.7;font-weight:300;display:none}
+.q-answer strong{color:var(--text);font-weight:600}
+.q-toggle{font-size:10px;font-weight:600;color:var(--blue);cursor:pointer;background:none;border:none;font-family:var(--font);padding:0;margin-top:6px;text-decoration:underline}
+
+/* ── TERMS ── */
+.terms{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.term{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.term-name{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--text);margin-bottom:3px}
+.term-def{font-size:11px;color:var(--text2);line-height:1.6;font-weight:300}
+@media(max-width:600px){.terms{grid-template-columns:1fr}}
+
+/* ── QA TABLE ── */
+.qa-wrap{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:14px 0}
+.qa-row{display:grid;grid-template-columns:5fr 7fr;border-bottom:1px solid var(--border)}
+.qa-row:last-child{border-bottom:none}
+.qa-row:hover{background:var(--bg)}
+.qa-q{padding:11px 14px;font-size:12px;font-weight:500;color:var(--text);border-right:1px solid var(--border);background:rgba(0,0,0,.015)}
+.qa-a{padding:11px 14px;font-size:12px;color:var(--text2);line-height:1.6;font-weight:300}
+
+/* ── CERTIFICATE ── */
+.cert{border:3px solid var(--text);border-radius:16px;padding:32px;margin:24px 0;text-align:center;position:relative;overflow:hidden}
+.cert::before{content:'';position:absolute;inset:6px;border:1px solid var(--border);border-radius:12px;pointer-events:none}
+.cert-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:16px}
+.cert-title{font-size:26px;font-weight:700;line-height:1.2;margin-bottom:8px}
+.cert-sub{font-size:13px;color:var(--text2);margin-bottom:20px;font-weight:300}
+.cert-modules{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:20px}
+.cert-mod{font-size:10px;font-weight:600;padding:4px 12px;border-radius:20px;border:1px solid}
+.cert-sign{font-size:12px;color:var(--text3);font-weight:300;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* ── ANIM ── */
+.fade{opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease}
+.fade.show{opacity:1;transform:none}
+
+/* ── PRINT HINT ── */
+.print-hint{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--text3);margin-bottom:24px;display:flex;align-items:center;gap:8px;font-weight:300}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sb-head">
+    <div class="sb-phase">ERP Training · GĐ 5/5</div>
+    <div class="sb-title">Workshop Ứng Dụng<br>Thực Hành</div>
+    <div class="sb-meta">2 ngày · Giai đoạn cuối</div>
+    <div class="sb-complete">
+      <span style="width:14px;height:14px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:white;font-weight:700">✓</span>
+      Hoàn thành khoá học!
+    </div>
+  </div>
+  <div class="nav-sec">
+    <span class="nav-lbl">Nội dung</span>
+    <a class="nav-a active" href="#overview"><div class="nav-ic" style="background:var(--blue-lt)">🗺️</div>Tổng quan &amp; Timeline</a>
+    <a class="nav-a" href="#ws1"><div class="nav-ic" style="background:var(--orange-lt)">🏪</div>WS1 — Công ty thương mại</a>
+    <a class="nav-a" href="#ws2"><div class="nav-ic" style="background:var(--purple-lt)">⚙️</div>WS2 — Code Review nghiệp vụ</a>
+    <a class="nav-a" href="#ws3"><div class="nav-ic" style="background:var(--teal-lt)">🔗</div>WS3 — Tích hợp liên module</a>
+    <a class="nav-a" href="#exam"><div class="nav-ic" style="background:var(--bg2)">📋</div>Bài kiểm tra cuối khoá</a>
+    <a class="nav-a" href="#cert"><div class="nav-ic" style="background:var(--amber-lt)">🏆</div>Chứng nhận hoàn thành</a>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-sec">
+    <span class="nav-lbl">Lộ trình</span>
+    <a class="nav-a done" href="erp-training-phase1.html"><div class="nav-ic" style="background:var(--green-lt);color:var(--green)">✓</div>GĐ 1 — Doanh nghiệp</a>
+    <a class="nav-a done" href="erp-training-phase2.html"><div class="nav-ic" style="background:var(--green-lt);color:var(--green)">✓</div>GĐ 2 — Module ERP</a>
+    <a class="nav-a done" href="erp-training-phase3.html"><div class="nav-ic" style="background:var(--green-lt);color:var(--green)">✓</div>GĐ 3 — Workflow</a>
+    <a class="nav-a done" href="erp-training-phase4.html"><div class="nav-ic" style="background:var(--green-lt);color:var(--green)">✓</div>GĐ 4 — Dashboard</a>
+    <a class="nav-a active" href="#"><div class="nav-ic" style="background:var(--blue-lt);color:var(--blue)">5</div>GĐ 5 — Workshop</a>
+  </div>
+</nav>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="bc"><span>ERP Training</span><span class="bc-sep">›</span><span>Giai đoạn 5</span><span class="bc-sep">›</span><span class="bc-cur">Workshop Ứng Dụng Thực Hành</span></div>
+  <div class="topbar-badge">
+    <span style="width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block"></span>
+    Giai đoạn cuối khoá
+  </div>
+</div>
+
+<main class="main">
+<div class="content">
+
+<!-- PAGE HEADER -->
+<div class="pg-head fade" id="overview">
+  <div class="phase-strip">
+    <div class="phase-num">5</div>
+    <div class="phase-label-wrap">
+      <div class="phase-label">Giai đoạn cuối · 2 ngày</div>
+      <div class="phase-name">Workshop Ứng Dụng Thực Hành</div>
+    </div>
+  </div>
+  <h1>Từ nghiệp vụ<br>đến <span class="accent">thiết kế hệ thống</span></h1>
+  <p class="pg-desc">Giai đoạn 5 là nơi kỹ sư tổng hợp toàn bộ kiến thức từ 4 giai đoạn trước và áp dụng vào 3 workshop thực chiến. Không còn lý thuyết — chỉ có bài toán thực tế, deadline, và đồng đội review nhau.</p>
+  <div class="meta-row">
+    <div class="meta-chip"><div class="m-dot" style="background:var(--orange)"></div>3 workshop thực hành</div>
+    <div class="meta-chip"><div class="m-dot" style="background:var(--purple)"></div>Làm nhóm 2–3 người</div>
+    <div class="meta-chip"><div class="m-dot" style="background:var(--teal)"></div>Bài kiểm tra cuối khoá</div>
+    <div class="meta-chip"><div class="m-dot" style="background:var(--green)"></div>Chứng nhận hoàn thành</div>
+  </div>
+
+  <!-- Overview KPIs -->
+  <div class="overview-grid">
+    <div class="ov-card" style="border-top-color:var(--blue)">
+      <div class="ov-num" style="color:var(--blue)">5</div>
+      <div class="ov-label">Giai đoạn học</div>
+      <div class="ov-sub">~12 ngày tổng cộng</div>
+    </div>
+    <div class="ov-card" style="border-top-color:var(--green)">
+      <div class="ov-num" style="color:var(--green)">18</div>
+      <div class="ov-label">Bài tập thực hành</div>
+      <div class="ov-sub">Từ phân tích đến code</div>
+    </div>
+    <div class="ov-card" style="border-top-color:var(--amber)">
+      <div class="ov-num" style="color:var(--amber)">3</div>
+      <div class="ov-label">Workshop thực chiến</div>
+      <div class="ov-sub">Scenario doanh nghiệp thực</div>
+    </div>
+    <div class="ov-card" style="border-top-color:var(--purple)">
+      <div class="ov-num" style="color:var(--purple)">1</div>
+      <div class="ov-label">Bài kiểm tra tổng hợp</div>
+      <div class="ov-sub">30 câu · 120 phút</div>
+    </div>
+  </div>
+
+  <!-- Progress tracker -->
+  <div class="progress-tracker">
+    <div class="pt-title">Tiến độ toàn khoá học</div>
+    <div class="pt-sub">Tích vào các giai đoạn đã hoàn thành để theo dõi tiến độ của bạn</div>
+    <div class="pt-phases">
+      <div class="pt-phase done" onclick="togglePhase(this,1)">
+        <div class="pt-phase-num">✓</div>
+        <div class="pt-phase-name">Doanh nghiệp</div>
+      </div>
+      <div class="pt-phase done" onclick="togglePhase(this,2)">
+        <div class="pt-phase-num">✓</div>
+        <div class="pt-phase-name">Module ERP</div>
+      </div>
+      <div class="pt-phase done" onclick="togglePhase(this,3)">
+        <div class="pt-phase-num">✓</div>
+        <div class="pt-phase-name">Workflow</div>
+      </div>
+      <div class="pt-phase done" onclick="togglePhase(this,4)">
+        <div class="pt-phase-num">✓</div>
+        <div class="pt-phase-name">Dashboard</div>
+      </div>
+      <div class="pt-phase current" onclick="togglePhase(this,5)">
+        <div class="pt-phase-num" id="ph5n">5</div>
+        <div class="pt-phase-name">Workshop</div>
+      </div>
+    </div>
+    <div class="pt-bar-wrap">
+      <div class="pt-bar-label"><span>Tiến độ tổng thể</span><span id="pct-txt">80%</span></div>
+      <div class="pt-bar"><div class="pt-bar-fill" id="main-bar" style="width:80%"></div></div>
+    </div>
+    <div class="pt-note" id="pt-note">Hoàn thành Workshop (GĐ 5) để đạt 100% và nhận chứng nhận</div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="card" style="margin-top:24px">
+    <div class="card-title"><div class="cd" style="background:var(--blue)"></div>Timeline Workshop — 2 ngày</div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-line"></div>
+        <div class="tl-dot" style="border-color:var(--orange);color:var(--orange)">1</div>
+        <div class="tl-body">
+          <div class="tl-title">Workshop 1 — Thiết kế module bán hàng (Hackathon)</div>
+          <div class="tl-desc">Nhóm nhận scenario công ty thương mại, phân tích nghiệp vụ, thiết kế ERD, xác định API endpoints và tất cả edge cases trong 4 giờ. Trình bày trước toàn nhóm.</div>
+          <div class="tl-time">Ngày 1 · Sáng (4 giờ) · Nhóm 2–3 người</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-line"></div>
+        <div class="tl-dot" style="border-color:var(--purple);color:var(--purple)">2</div>
+        <div class="tl-body">
+          <div class="tl-title">Workshop 2 — Code Review từ góc độ nghiệp vụ</div>
+          <div class="tl-desc">Nhận code base ERP hiện tại (hoặc mô phỏng). Review từng module qua lăng kính nghiệp vụ: logic sai chỗ nào, thiếu ràng buộc gì, trường dữ liệu nào không đủ.</div>
+          <div class="tl-time">Ngày 1 · Chiều (3 giờ) · Cá nhân + thảo luận nhóm</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-line"></div>
+        <div class="tl-dot" style="border-color:var(--teal);color:var(--teal)">3</div>
+        <div class="tl-body">
+          <div class="tl-title">Workshop 3 — Tích hợp liên module &amp; Event Design</div>
+          <div class="tl-desc">Thiết kế luồng dữ liệu khi xác nhận đơn hàng kéo theo kho, kế toán, công nợ. Chọn kiến trúc: event-driven vs tight-coupling cho SMB ERP. Trade-off analysis.</div>
+          <div class="tl-time">Ngày 2 · Sáng (4 giờ) · Nhóm 2–3 người</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot" style="border-color:var(--text);color:var(--text)">✓</div>
+        <div class="tl-body">
+          <div class="tl-title">Bài kiểm tra cuối khoá + Lễ trao chứng nhận</div>
+          <div class="tl-desc">30 câu hỏi tổng hợp toàn bộ kiến thức. Điểm ≥ 70% nhận chứng nhận. Feedback session và định hướng tiếp theo.</div>
+          <div class="tl-time">Ngày 2 · Chiều (2 giờ) · Cá nhân</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     WORKSHOP 1
+═══════════════════════════════════ -->
+<div class="section fade" id="ws1">
+  <div class="sec-label">Workshop 1</div>
+
+  <div class="workshop">
+    <div class="ws-header" style="background:var(--orange-lt);border-bottom:1px solid var(--orange-md)">
+      <div class="ws-num" style="background:var(--orange)">W1</div>
+      <div class="ws-info">
+        <div class="ws-tag" style="color:var(--orange)">Hackathon · Thiết kế hệ thống</div>
+        <div class="ws-title">Thiết kế module bán hàng từ đầu</div>
+        <div class="ws-desc">Nhóm nhận scenario thực tế, áp dụng kiến thức từ GĐ 1–4 để thiết kế module Sales hoàn chỉnh: ERD, workflow, API spec, dashboard KPI, và toàn bộ edge cases.</div>
+        <div class="ws-meta">
+          <span class="ws-badge" style="background:white;border:1px solid var(--orange-md);color:var(--orange)">4 giờ</span>
+          <span class="ws-badge" style="background:white;border:1px solid var(--orange-md);color:var(--orange)">Nhóm 2–3 người</span>
+          <span class="ws-badge" style="background:white;border:1px solid var(--orange-md);color:var(--orange)">Trình bày 15 phút</span>
+        </div>
+      </div>
+    </div>
+    <div class="ws-body">
+      <div class="ws-divider"></div>
+
+      <div class="scenario-box">
+        <div class="scenario-label">
+          <span style="background:var(--orange-lt);color:var(--orange);padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700">SCENARIO</span>
+          Công ty thương mại điện tử tổng hợp — Minh Thành Co.
+        </div>
+        <div class="scenario-text">
+          <strong>Quy mô:</strong> 25 nhân viên, doanh thu ~3 tỷ/tháng. Kinh doanh thiết bị văn phòng (máy tính, máy in, phụ kiện).<br><br>
+          <strong>Kênh bán hàng:</strong> (1) Bán lẻ trực tiếp tại showroom, (2) Bán buôn cho các công ty qua nhân viên sale, (3) Đơn hàng online qua website (tích hợp sau).<br><br>
+          <strong>Đặc thù:</strong> Khách hàng doanh nghiệp thường mua nhiều lần, có hạn mức công nợ riêng (credit limit). Một số sản phẩm có serial number (laptop, máy in). Có chính sách bảo hành 12–24 tháng. Giá bán theo 3 bảng giá: lẻ, buôn cấp 1, buôn cấp 2. Chiết khấu theo số lượng.<br><br>
+          <strong>Pain point hiện tại:</strong> Đang quản lý bằng Excel + Zalo. Hay xảy ra: bán hàng không biết còn tồn kho không, quên không xuất hóa đơn, không biết khách nào đang nợ quá hạn, nhân viên không biết đơn hàng đang ở bước nào.
+        </div>
+      </div>
+
+      <div class="callout c-amber"><strong>Mục tiêu workshop:</strong> Sau 4 giờ, nhóm phải có đủ tài liệu để một kỹ sư mới join có thể bắt đầu code ngay mà không cần hỏi thêm — đó là mức độ hoàn chỉnh cần đạt được.</div>
+
+      <p class="prose" style="margin-top:16px;font-weight:500;color:var(--text)">Checklist deliverables — tích vào khi hoàn thành:</p>
+
+      <div class="deliverables">
+        <div class="del-head">Deliverables bắt buộc (8 mục)</div>
+        <ul class="del-list">
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">ERD — Entity Relationship Diagram</div>
+              <div class="del-hint">Tất cả bảng của module Sales: customers, pricelists, quotations, sale_orders, sale_order_lines, deliveries, invoices, payments, serial_numbers. Ghi rõ quan hệ 1:1, 1:N, N:M và foreign keys.</div>
+              <span class="del-tag" style="background:var(--orange-lt);color:var(--orange);border:1px solid var(--orange-md)">ERD · Database</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Workflow BPMN — Happy path + 5 exception flows</div>
+              <div class="del-hint">Happy path: Quotation → SO → Delivery → Invoice → Payment. Exception: giao thiếu, trả hàng, hủy đơn, hết hạn mức công nợ, hàng thiếu serial number.</div>
+              <span class="del-tag" style="background:var(--orange-lt);color:var(--orange);border:1px solid var(--orange-md)">BPMN · Workflow</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">API Spec — 10 endpoints chính</div>
+              <div class="del-hint">Method, URL, Request body, Response schema, Status codes, Auth required. Bao gồm: tạo/xác nhận SO, tạo delivery, xuất invoice, thu tiền, kiểm tra credit limit khách hàng.</div>
+              <span class="del-tag" style="background:var(--orange-lt);color:var(--orange);border:1px solid var(--orange-md)">API · Backend</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Business Rules — Danh sách validation bắt buộc</div>
+              <div class="del-hint">Ví dụ: không cho tạo SO khi khách quá hạn mức công nợ, không cho xuất kho khi tồn không đủ, không xóa SO đã confirmed, discount không vượt 30% trừ khi GĐ duyệt...</div>
+              <span class="del-tag" style="background:var(--orange-lt);color:var(--orange);border:1px solid var(--orange-md)">Rules · Validation</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">State Machine — Trạng thái của Sales Order</div>
+              <div class="del-hint">Tất cả trạng thái có thể có (Draft, Confirmed, Partially Delivered, Done, Cancelled) và điều kiện để chuyển giữa các trạng thái. Ai được phép trigger mỗi chuyển trạng thái.</div>
+              <span class="del-tag" style="background:var(--orange-lt);color:var(--orange);border:1px solid var(--orange-md)">State Machine · Logic</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Pricing Engine Design — Cơ chế tính giá</div>
+              <div class="del-hint">Làm thế nào để áp đúng bảng giá theo loại khách, áp chiết khấu theo số lượng, áp promotion đang chạy. Thứ tự ưu tiên khi nhiều rule cùng áp dụng.</div>
+              <span class="del-tag" style="background:var(--orange-lt);color:var(--orange);border:1px solid var(--orange-md)">Pricing · Algorithm</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Dashboard Spec — Sales Manager view</div>
+              <div class="del-hint">8 KPI cards + 2 charts + 1 table. Mỗi KPI: tên, công thức tính, nguồn dữ liệu (bảng nào, query như thế nào), ngưỡng xanh/vàng/đỏ, tần suất cập nhật.</div>
+              <span class="del-tag" style="background:var(--orange-lt);color:var(--orange);border:1px solid var(--orange-md)">Dashboard · KPI</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Edge Cases &amp; Open Questions</div>
+              <div class="del-hint">Liệt kê ít nhất 10 câu hỏi chưa có câu trả lời rõ ràng cần hỏi khách hàng. Và 10 edge cases đặc thù của scenario này mà kỹ sư phải xử lý.</div>
+              <span class="del-tag" style="background:var(--orange-lt);color:var(--orange);border:1px solid var(--orange-md)">Edge Cases · QA</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="cd" style="background:var(--orange)"></div>Rubric chấm điểm Workshop 1</div>
+        <table class="rubric">
+          <thead><tr><th>Tiêu chí</th><th>Đạt (8–10đ)</th><th>Chưa đạt (0–5đ)</th><th>Điểm tối đa</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>ERD đầy đủ và đúng</td>
+              <td>Đủ bảng, đúng quan hệ, có indexes, không thiếu trường quan trọng</td>
+              <td>Thiếu bảng, quan hệ sai, không có FK</td>
+              <td><span class="score" style="background:var(--blue-lt);color:var(--blue)">25đ</span></td>
+            </tr>
+            <tr>
+              <td>BPMN chính xác</td>
+              <td>Đúng ký hiệu, có đủ exception flows, ai làm gì rõ ràng</td>
+              <td>Sai ký hiệu, chỉ có happy path, actor không rõ</td>
+              <td><span class="score" style="background:var(--blue-lt);color:var(--blue)">20đ</span></td>
+            </tr>
+            <tr>
+              <td>Business Rules thực tế</td>
+              <td>Rules phản ánh đúng nghiệp vụ thực, không quá chặt cũng không quá lỏng</td>
+              <td>Rules thiếu thực tế, copy lý thuyết mà không áp vào scenario</td>
+              <td><span class="score" style="background:var(--blue-lt);color:var(--blue)">20đ</span></td>
+            </tr>
+            <tr>
+              <td>API Spec rõ ràng</td>
+              <td>Có thể dùng để implement ngay, request/response đầy đủ</td>
+              <td>Thiếu error cases, schema mơ hồ</td>
+              <td><span class="score" style="background:var(--blue-lt);color:var(--blue)">20đ</span></td>
+            </tr>
+            <tr>
+              <td>Chất lượng trình bày</td>
+              <td>Mạch lạc, trả lời được câu hỏi, nhóm đồng thuận với nhau</td>
+              <td>Lộn xộn, thành viên không biết sản phẩm nhóm mình làm</td>
+              <td><span class="score" style="background:var(--blue-lt);color:var(--blue)">15đ</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     WORKSHOP 2
+═══════════════════════════════════ -->
+<div class="section fade" id="ws2">
+  <div class="sec-label">Workshop 2</div>
+
+  <div class="workshop">
+    <div class="ws-header" style="background:var(--purple-lt);border-bottom:1px solid var(--purple-md)">
+      <div class="ws-num" style="background:var(--purple)">W2</div>
+      <div class="ws-info">
+        <div class="ws-tag" style="color:var(--purple)">Code Review · Phân tích</div>
+        <div class="ws-title">Code Review từ góc độ nghiệp vụ</div>
+        <div class="ws-desc">Nhận một codebase ERP mô phỏng có chủ đích nhiều lỗi nghiệp vụ. Nhiệm vụ: tìm ra tất cả chỗ sai, giải thích tại sao sai và sửa đúng như thế nào.</div>
+        <div class="ws-meta">
+          <span class="ws-badge" style="background:white;border:1px solid var(--purple-md);color:var(--purple)">3 giờ</span>
+          <span class="ws-badge" style="background:white;border:1px solid var(--purple-md);color:var(--purple)">Cá nhân</span>
+          <span class="ws-badge" style="background:white;border:1px solid var(--purple-md);color:var(--purple)">Thảo luận nhóm cuối</span>
+        </div>
+      </div>
+    </div>
+    <div class="ws-body">
+      <div class="ws-divider"></div>
+
+      <p class="prose">Dưới đây là code và schema của một ERP mini đang chạy thực tế. <strong>Mỗi đoạn code đều có ít nhất 2–3 lỗi nghiệp vụ</strong>. Kỹ sư cần tìm ra tất cả và ghi lại:</p>
+
+      <!-- Code snippet 1 -->
+      <div class="scenario-box" style="background:#1e293b;border-color:#334155">
+        <div class="scenario-label" style="color:#94a3b8">
+          <span style="background:#334155;color:#60a5fa;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700">SNIPPET 1</span>
+          API: Xác nhận đơn hàng
+        </div>
+        <pre style="font-family:var(--mono);font-size:11px;color:#e2e8f0;line-height:1.8;overflow-x:auto"><code><span style="color:#94a3b8">// POST /api/orders/:id/confirm</span>
+async function confirmOrder(orderId) {
+  const order = await db.orders.findById(orderId);
+  
+  <span style="color:#94a3b8">// Kiểm tra tồn kho</span>
+  for (const item of order.items) {
+    const product = await db.products.findById(item.productId);
+    if (product.stock &lt; item.quantity) {
+      throw new Error('Không đủ hàng');
+    }
+    <span style="color:#94a3b8">// Trừ tồn kho</span>
+    await db.products.update(item.productId, {
+      stock: product.stock - item.quantity
+    });
+  }
+  
+  <span style="color:#94a3b8">// Cập nhật trạng thái</span>
+  await db.orders.update(orderId, { 
+    status: 'confirmed' 
+  });
+  
+  return { success: true };
+}</code></pre>
+      </div>
+
+      <div class="callout c-red">
+        <strong>Gợi ý phân tích Snippet 1:</strong> Tìm ít nhất 5 lỗi nghiệp vụ. Gợi ý: nghĩ về atomicity, audit trail, credit limit, bút toán kế toán, và điều gì xảy ra nếu server crash giữa chừng vòng lặp for.
+      </div>
+
+      <!-- Code snippet 2 -->
+      <div class="scenario-box" style="background:#1e293b;border-color:#334155;margin-top:16px">
+        <div class="scenario-label" style="color:#94a3b8">
+          <span style="background:#334155;color:#a78bfa;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700">SNIPPET 2</span>
+          Database Schema: Products &amp; Orders
+        </div>
+        <pre style="font-family:var(--mono);font-size:11px;color:#e2e8f0;line-height:1.8;overflow-x:auto"><code>CREATE TABLE products (
+  id        INT PRIMARY KEY AUTO_INCREMENT,
+  name      VARCHAR(255),
+  price     DECIMAL(10,2),
+  stock     INT DEFAULT 0
+);
+
+CREATE TABLE orders (
+  id          INT PRIMARY KEY AUTO_INCREMENT,
+  customer    VARCHAR(255),
+  total       DECIMAL(10,2),
+  status      VARCHAR(20),
+  created_at  DATETIME DEFAULT NOW()
+);
+
+CREATE TABLE order_items (
+  id         INT PRIMARY KEY AUTO_INCREMENT,
+  order_id   INT,
+  product    VARCHAR(255),
+  qty        INT,
+  price      DECIMAL(10,2)
+);</code></pre>
+      </div>
+
+      <div class="callout c-red">
+        <strong>Gợi ý phân tích Snippet 2:</strong> Tìm ít nhất 8 vấn đề về schema. Gợi ý: foreign keys, soft delete, audit fields, pricing history, currency, tax, trường nào thiếu để làm báo cáo.
+      </div>
+
+      <!-- Code snippet 3 -->
+      <div class="scenario-box" style="background:#1e293b;border-color:#334155;margin-top:16px">
+        <div class="scenario-label" style="color:#94a3b8">
+          <span style="background:#334155;color:#34d399;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700">SNIPPET 3</span>
+          Inventory: Xuất kho và tính giá vốn
+        </div>
+        <pre style="font-family:var(--mono);font-size:11px;color:#e2e8f0;line-height:1.8;overflow-x:auto"><code>async function processDelivery(orderId) {
+  const order = await db.orders.findById(orderId);
+  
+  for (const item of order.items) {
+    <span style="color:#94a3b8">// Xuất kho</span>
+    await db.products.decrement(item.productId, item.qty);
+    
+    <span style="color:#94a3b8">// Ghi nhận giá vốn = giá mua mới nhất</span>
+    const lastPurchase = await db.purchases
+      .findLast({ productId: item.productId });
+    
+    await db.cogs.insert({
+      orderId,
+      productId: item.productId,
+      qty: item.qty,
+      cost: lastPurchase.price  <span style="color:#94a3b8">// FIFO? AVG? Không rõ</span>
+    });
+  }
+  
+  <span style="color:#94a3b8">// Gửi email cho khách</span>
+  await emailService.send(order.customerEmail, 
+    'Đơn hàng đang giao');
+    
+  await db.orders.update(orderId, { status: 'delivered' });
+}</code></pre>
+      </div>
+
+      <div class="callout c-red">
+        <strong>Gợi ý phân tích Snippet 3:</strong> Tìm ít nhất 4 lỗi. Gợi ý: FIFO vs AVG không nhất quán, email blocking DB transaction, không có journal entry kế toán, không kiểm tra order status trước khi xử lý.
+      </div>
+
+      <div class="deliverables" style="margin-top:16px">
+        <div class="del-head">Deliverables Workshop 2</div>
+        <ul class="del-list">
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Báo cáo Code Review — tối thiểu 15 lỗi nghiệp vụ</div>
+              <div class="del-hint">Mỗi lỗi: snippet số mấy, dòng code nào, tên lỗi, giải thích tại sao sai về mặt nghiệp vụ, hệ quả khi chạy thực tế, và cách sửa đúng.</div>
+              <span class="del-tag" style="background:var(--purple-lt);color:var(--purple);border:1px solid var(--purple-md)">Code Review · Document</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Schema được thiết kế lại hoàn chỉnh</div>
+              <div class="del-hint">Viết lại toàn bộ CREATE TABLE statements theo chuẩn ERP: đủ fields, đúng types, có FK constraints, có audit fields, có soft delete.</div>
+              <span class="del-tag" style="background:var(--purple-lt);color:var(--purple);border:1px solid var(--purple-md)">Schema · SQL</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Pseudocode confirmOrder() đúng nghiệp vụ</div>
+              <div class="del-hint">Viết lại hàm confirmOrder với đầy đủ: transaction, credit limit check, inventory reservation, journal entry creation, audit log, và proper error handling.</div>
+              <span class="del-tag" style="background:var(--purple-lt);color:var(--purple);border:1px solid var(--purple-md)">Pseudocode · Logic</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     WORKSHOP 3
+═══════════════════════════════════ -->
+<div class="section fade" id="ws3">
+  <div class="sec-label">Workshop 3</div>
+
+  <div class="workshop">
+    <div class="ws-header" style="background:var(--teal-lt);border-bottom:1px solid var(--teal-md)">
+      <div class="ws-num" style="background:var(--teal)">W3</div>
+      <div class="ws-info">
+        <div class="ws-tag" style="color:var(--teal)">Kiến trúc · Integration Design</div>
+        <div class="ws-title">Tích hợp liên module &amp; Event Design</div>
+        <div class="ws-desc">Khi Sales Order được xác nhận, có bao nhiêu module bị ảnh hưởng? Thiết kế luồng dữ liệu liên module và chọn kiến trúc phù hợp cho SMB ERP.</div>
+        <div class="ws-meta">
+          <span class="ws-badge" style="background:white;border:1px solid var(--teal-md);color:var(--teal)">4 giờ</span>
+          <span class="ws-badge" style="background:white;border:1px solid var(--teal-md);color:var(--teal)">Nhóm 2–3 người</span>
+          <span class="ws-badge" style="background:white;border:1px solid var(--teal-md);color:var(--teal)">Debate kiến trúc</span>
+        </div>
+      </div>
+    </div>
+    <div class="ws-body">
+      <div class="ws-divider"></div>
+
+      <div class="card">
+        <div class="card-title"><div class="cd" style="background:var(--teal)"></div>Khi SO được xác nhận — ai cần biết?</div>
+        <p class="prose">Một hành động "xác nhận đơn hàng" kéo theo <strong>ít nhất 6 module</strong> cần cập nhật đồng thời hoặc tuần tự. Kỹ sư phải thiết kế rõ: module nào cập nhật ngay (synchronous), module nào có thể đợi (asynchronous), và khi có lỗi thì rollback như thế nào.</p>
+
+        <div class="scenario-box">
+          <div class="scenario-label">Cascade effect khi SO confirmed</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px">
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px">
+              <div style="font-size:10px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⚡ Phải xảy ra ngay (Sync)</div>
+              <ul style="list-style:none;font-size:12px;color:var(--text2);line-height:2">
+                <li>→ Kho: Reserve số lượng hàng</li>
+                <li>→ Kế toán: Ghi nhận doanh thu</li>
+                <li>→ Công nợ: Tăng AR của khách</li>
+                <li>→ Credit limit: Trừ hạn mức tín dụng</li>
+              </ul>
+            </div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px">
+              <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🔄 Có thể async (Queue)</div>
+              <ul style="list-style:none;font-size:12px;color:var(--text2);line-height:2">
+                <li>→ Kho: Tạo Delivery Order</li>
+                <li>→ Email/SMS: Thông báo khách</li>
+                <li>→ MRP: Kiểm tra cần sản xuất thêm</li>
+                <li>→ Báo cáo: Cập nhật dashboard</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="cd" style="background:var(--teal)"></div>Trade-off: Tight Coupling vs Event-Driven cho SMB ERP</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div style="border:1.5px solid var(--amber-md);border-radius:10px;overflow:hidden">
+            <div style="background:var(--amber-lt);padding:10px 14px;border-bottom:1px solid var(--amber-md)">
+              <div style="font-size:11px;font-weight:700;color:var(--amber)">Tight Coupling (Monolith)</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px">Phù hợp cho SMB nhỏ (&lt;5 devs)</div>
+            </div>
+            <div style="padding:12px 14px">
+              <div style="font-size:11px;color:var(--text2);line-height:1.8;font-weight:300">
+                <div style="color:var(--green);margin-bottom:6px"><strong>Ưu điểm:</strong></div>
+                <div>✓ Đơn giản, dễ debug</div>
+                <div>✓ Transaction ACID toàn bộ</div>
+                <div>✓ Không cần message broker</div>
+                <div>✓ Latency thấp</div>
+                <div style="color:var(--red);margin-top:8px;margin-bottom:6px"><strong>Nhược điểm:</strong></div>
+                <div>✗ Khó scale từng module</div>
+                <div>✗ Một module lỗi → cả hệ thống</div>
+                <div>✗ Khó deploy riêng từng phần</div>
+              </div>
+            </div>
+          </div>
+          <div style="border:1.5px solid var(--blue-md);border-radius:10px;overflow:hidden">
+            <div style="background:var(--blue-lt);padding:10px 14px;border-bottom:1px solid var(--blue-md)">
+              <div style="font-size:11px;font-weight:700;color:var(--blue)">Event-Driven (Microservices)</div>
+              <div style="font-size:10px;color:var(--text3);margin-top:2px">Phù hợp khi &gt;10 devs, scale cao</div>
+            </div>
+            <div style="padding:12px 14px">
+              <div style="font-size:11px;color:var(--text2);line-height:1.8;font-weight:300">
+                <div style="color:var(--green);margin-bottom:6px"><strong>Ưu điểm:</strong></div>
+                <div>✓ Scale từng service riêng</div>
+                <div>✓ Fault isolation tốt</div>
+                <div>✓ Team độc lập</div>
+                <div style="color:var(--red);margin-top:8px;margin-bottom:6px"><strong>Nhược điểm:</strong></div>
+                <div>✗ Phức tạp hơn nhiều</div>
+                <div>✗ Eventual consistency khó xử lý</div>
+                <div>✗ Cần message broker (Kafka, RabbitMQ)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout c-teal"><strong>Khuyến nghị cho SMB ERP:</strong> Bắt đầu với <strong>modular monolith</strong> — một codebase nhưng tổ chức theo module rõ ràng, giao tiếp qua internal events (không qua network). Khi cần scale module cụ thể mới tách ra. Đừng over-engineer ngay từ đầu cho khách hàng 20 người dùng.</div>
+      </div>
+
+      <div class="deliverables">
+        <div class="del-head">Deliverables Workshop 3</div>
+        <ul class="del-list">
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Integration Map — Sơ đồ tác động liên module</div>
+              <div class="del-hint">Vẽ sơ đồ: khi SO confirmed → module nào nhận event, xử lý gì, sinh ra event gì tiếp theo. Phân biệt sync vs async. Bao gồm: Sales, Inventory, Accounting, AR, Delivery, Dashboard.</div>
+              <span class="del-tag" style="background:var(--teal-lt);color:var(--teal);border:1px solid var(--teal-md)">Architecture · Diagram</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Event Schema — Định nghĩa SaleOrderConfirmed event</div>
+              <div class="del-hint">Viết JSON schema của event: event_type, event_id, timestamp, aggregate_id, payload (đủ thông tin để mọi consumer xử lý mà không cần query thêm), metadata.</div>
+              <span class="del-tag" style="background:var(--teal-lt);color:var(--teal);border:1px solid var(--teal-md)">Event Schema · JSON</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Quyết định kiến trúc có lý do (ADR)</div>
+              <div class="del-hint">Architecture Decision Record: chọn tight coupling hay event-driven cho khách hàng scenario WS1. Lý do chọn, rủi ro, và khi nào thì nên thay đổi quyết định này.</div>
+              <span class="del-tag" style="background:var(--teal-lt);color:var(--teal);border:1px solid var(--teal-md)">ADR · Decision</span>
+            </div>
+          </li>
+          <li class="del-item">
+            <div class="del-check" onclick="toggleCheck(this)"></div>
+            <div class="del-content">
+              <div class="del-title">Xử lý failure scenario</div>
+              <div class="del-hint">Thiết kế: điều gì xảy ra khi SO confirmed thành công nhưng journal entry kế toán bị lỗi? Khi email service down? Khi Delivery Order không tạo được? Compensating transaction là gì?</div>
+              <span class="del-tag" style="background:var(--teal-lt);color:var(--teal);border:1px solid var(--teal-md)">Resilience · Saga</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     BÀI KIỂM TRA CUỐI KHOÁ
+═══════════════════════════════════ -->
+<div class="section fade" id="exam">
+  <div class="sec-label">Kiểm tra tổng hợp</div>
+  <div class="sec-head"><div class="sec-num" style="background:var(--bg2);border-color:var(--border2);color:var(--text)">📋</div><div class="sec-title">Bài kiểm tra cuối khoá</div></div>
+  <div class="sec-sub">30 câu hỏi · 120 phút · Đạt ≥ 70% để nhận chứng nhận</div>
+
+  <div class="print-hint">
+    💡 Bài kiểm tra này dành cho trainer sử dụng. Click "Xem đáp án" để hiển thị đáp án tham khảo sau khi học viên hoàn thành.
+  </div>
+
+  <div class="exam-card">
+    <div class="exam-head">
+      <div class="exam-icon">📋</div>
+      <div class="exam-info">
+        <div class="exam-label">Phần A — Lý thuyết nghiệp vụ (15 câu · 45 phút)</div>
+        <div class="exam-title">Kiến thức nền tảng ERP</div>
+      </div>
+    </div>
+    <div class="exam-body">
+
+      <div class="q-block">
+        <div class="q-num">Câu 1 / 30</div>
+        <div class="q-text">Một công ty sản xuất nước uống vừa mở thêm chuỗi cửa hàng bán lẻ trực tiếp. Liệt kê tất cả module ERP cần thiết và giải thích tại sao mỗi module là cần thiết với loại hình kinh doanh kết hợp này.</div>
+        <div class="q-hint">Gợi ý: nghĩ đến cả hai luồng — sản xuất và bán lẻ — và sự giao thoa giữa chúng.</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer">Các module cần: <strong>MRP/Sản xuất</strong> (BOM, Work Order, tính COGM cho nước uống), <strong>Kho NVL + Kho thành phẩm</strong> (hai kho riêng biệt), <strong>Mua hàng</strong> (nguyên liệu, bao bì), <strong>Bán hàng/POS</strong> (bán lẻ tại cửa hàng), <strong>Phân phối</strong> (chuyển thành phẩm từ nhà máy ra cửa hàng — internal transfer), <strong>Kế toán</strong> (ghi nhận COGM, doanh thu bán lẻ), <strong>Nhân sự</strong> (công nhân nhà máy + nhân viên cửa hàng khác nhau về cách tính lương), <strong>Báo cáo</strong> (P&amp;L tách theo nhà máy vs chuỗi bán lẻ).</div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-num">Câu 2 / 30</div>
+        <div class="q-text">Giải thích 3-way matching. Tại sao đây là kiểm soát nội bộ quan trọng nhất trong module mua hàng? Kể một ví dụ gian lận cụ thể mà 3-way matching sẽ ngăn chặn được.</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer">3-way matching đối chiếu <strong>PO (đặt hàng) + GRN (nhận hàng) + Vendor Invoice (hóa đơn NCC)</strong> trước khi cho phép thanh toán. Ví dụ gian lận: nhân viên mua hàng thông đồng với NCC, NCC xuất hóa đơn 110 cái nhưng chỉ giao 100 cái. Nếu không có 3-way matching, kế toán thanh toán theo hóa đơn 110 cái → thiệt hại 10 cái. Với 3-way matching: GRN ghi 100 cái → hệ thống chặn thanh toán → phát sinh cảnh báo chênh lệch.</div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-num">Câu 3 / 30</div>
+        <div class="q-text">Phương pháp tính giá tồn kho FIFO và AVG ảnh hưởng đến database schema như thế nào? Viết cấu trúc bảng cho mỗi phương pháp.</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer"><strong>FIFO:</strong> Cần bảng <code>stock_lots(id, product_id, lot_date, quantity_remaining, unit_cost)</code>. Khi xuất kho: lấy lô cũ nhất còn hàng trước, giảm quantity_remaining. <strong>AVG:</strong> Chỉ cần thêm <code>avg_cost DECIMAL</code> vào bảng products. Khi nhập hàng mới: avg_cost = (tổng giá trị hiện tại + giá trị nhập mới) / (tổng số lượng mới). Khi xuất: giá vốn = avg_cost tại thời điểm xuất.</div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-num">Câu 4 / 30</div>
+        <div class="q-text">Tại sao không nên xóa một Sales Order đã được xác nhận dù khách hàng yêu cầu hủy? Mô tả đúng quy trình hủy đơn hàng và các tác động đến dữ liệu liên quan.</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer">SO đã confirmed đã: (1) reserve tồn kho, (2) có thể đã tạo DO, (3) đã ghi nhận trong hệ thống kế toán. Xóa SO sẽ gây inconsistency. Quy trình đúng: (1) Tạo Cancellation Request có lý do, (2) Phê duyệt nếu cần, (3) Giải phóng inventory reservation, (4) Nếu đã xuất hóa đơn: tạo Credit Note, (5) Nếu đã xuất kho: tạo Return Order, (6) SO chuyển trạng thái Cancelled — không xóa, lưu mãi để audit trail.</div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-num">Câu 5 / 30</div>
+        <div class="q-text">Thiết kế state machine hoàn chỉnh cho Purchase Order. Liệt kê tất cả trạng thái, điều kiện chuyển trạng thái, và ai có quyền trigger mỗi chuyển trạng thái.</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer">Trạng thái: <strong>Draft</strong> (NV tạo, sửa tự do) → <strong>Submitted</strong> (NV submit, chờ duyệt) → <strong>Approved</strong> (Quản lý duyệt, gửi NCC) → <strong>Sent to Vendor</strong> (NCC nhận) → <strong>Partially Received</strong> (đã nhận một phần) → <strong>Fully Received</strong> (nhận đủ) → <strong>Closed</strong> (đã match invoice &amp; thanh toán). Nhánh: từ Approved/Sent → <strong>Cancelled</strong> (GĐ duyệt hủy, có lý do). Từ Draft → <strong>Rejected</strong> (Quản lý từ chối). Ai trigger: NV (Draft→Submitted), Quản lý (Submitted→Approved/Rejected), Thủ kho (→Partially/Fully Received), KT (→Closed).</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="exam-card" style="margin-top:16px">
+    <div class="exam-head">
+      <div class="exam-icon">⚙️</div>
+      <div class="exam-info">
+        <div class="exam-label">Phần B — Thiết kế hệ thống (10 câu · 45 phút)</div>
+        <div class="exam-title">Áp dụng vào thiết kế thực tế</div>
+      </div>
+    </div>
+    <div class="exam-body">
+
+      <div class="q-block">
+        <div class="q-num">Câu 16 / 30</div>
+        <div class="q-text">Một khách hàng yêu cầu: "Tôi muốn xem báo cáo doanh thu theo từng nhân viên bán hàng, theo tháng, so sánh với cùng kỳ năm ngoái, breakdown theo nhóm sản phẩm." Thiết kế query và schema để đáp ứng yêu cầu này hiệu quả.</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer">Cần: (1) <code>sale_orders</code> có <code>salesperson_id, confirmed_date</code>; (2) <code>sale_order_lines</code> có <code>product_id, subtotal</code>; (3) <code>products</code> có <code>category_id</code>; (4) <code>dim_date</code> có <code>month, year</code> để filter nhanh. Query: GROUP BY salesperson_id, MONTH(confirmed_date), YEAR(confirmed_date), category_id. Với "cùng kỳ năm ngoái": UNION hoặc subquery với YEAR = current_year - 1. Tối ưu: tạo materialized view hoặc fact table cập nhật daily nếu data lớn.</div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-num">Câu 17 / 30</div>
+        <div class="q-text">Thiết kế hệ thống phân quyền (RBAC) cho ERP có 5 vai trò: Admin, Giám đốc, Kế toán, Nhân viên bán hàng, Thủ kho. Phân quyền phải hỗ trợ: record-level (chỉ thấy data của bộ phận mình), state-based (không sửa được document đã approved), và field-level (không thấy giá vốn nếu không phải kế toán).</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer">Schema: <code>roles(id, name)</code>, <code>permissions(id, role_id, resource, action, conditions JSONB)</code>. Conditions ví dụ: <code>{"department": "own", "status": ["draft","submitted"]}</code>. Implement: (1) Record-level: thêm <code>department_id</code> vào mọi document, filter ở tầng repository; (2) State-based: check <code>status</code> trong permission conditions trước khi cho phép action; (3) Field-level: GraphQL field resolvers hoặc serializer loại bỏ field nhạy cảm theo role. Lưu permission check vào audit_log.</div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-num">Câu 20 / 30</div>
+        <div class="q-text">Khách hàng phàn nàn rằng khi nhân viên bán hàng tạo đơn hàng giờ cao điểm, hệ thống rất chậm. Nguyên nhân có thể là gì từ góc độ nghiệp vụ ERP và bạn sẽ giải quyết như thế nào?</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer">Nguyên nhân nghiệp vụ: (1) Khi tạo SO đang check stock và lock rows trong inventory table → blocking khác; (2) Đang tính price realtime từ nhiều bảng phức tạp (pricelist, discount, tax); (3) Sync journal entry creation blocking; (4) Missing indexes trên date + status columns. Giải pháp: (1) Separate inventory reservation vào async queue — show "reserved" optimistically; (2) Cache pricelist vào memory, invalidate khi admin sửa; (3) Journal entry async sau khi SO confirmed; (4) Add composite index (customer_id, status, created_at).</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="exam-card" style="margin-top:16px">
+    <div class="exam-head">
+      <div class="exam-icon">🔍</div>
+      <div class="exam-info">
+        <div class="exam-label">Phần C — Phân tích tình huống (5 câu · 30 phút)</div>
+        <div class="exam-title">Case study và quyết định thực tế</div>
+      </div>
+    </div>
+    <div class="exam-body">
+
+      <div class="q-block">
+        <div class="q-num">Câu 26 / 30</div>
+        <div class="q-text">Bạn đang code review và thấy đồng nghiệp viết: <code>await db.orders.delete(orderId)</code> sau khi khách hàng yêu cầu hủy đơn. Đơn hàng này đã ở trạng thái "confirmed" và đã tạo Delivery Order. Bạn sẽ comment gì và đề xuất code đúng như thế nào?</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer">Comment: "❌ Hard delete nghiêm trọng — vi phạm audit trail. SO đã confirmed đã tạo DO và có thể đã ghi journal entry. Xóa sẽ gây orphan records và mất lịch sử kiểm toán." Cách đúng: (1) Validate: order.status === 'confirmed'; (2) Validate: DO chưa được pick (nếu đã pick thì cần return flow khác); (3) Begin transaction; (4) Cancel DO liên quan; (5) Release inventory reservation; (6) Reverse journal entries nếu có; (7) Update order.status = 'cancelled', order.cancelled_at = now(), order.cancelled_by = userId, order.cancel_reason = reason; (8) Commit. Không bao giờ delete.</div>
+      </div>
+
+      <div class="q-block">
+        <div class="q-num">Câu 30 / 30</div>
+        <div class="q-text">Một khách hàng SMB mới yêu cầu ERP có tất cả tính năng: Sản xuất, Kho, Mua hàng, Bán hàng, Kế toán, Nhân sự, CRM, E-commerce, Logistics. Timeline: 3 tháng. Team của bạn có 4 người. Bạn sẽ tư vấn như thế nào?</div>
+        <button class="q-toggle" onclick="toggleAnswer(this)">Xem đáp án tham khảo</button>
+        <div class="q-answer">Không thể làm tốt tất cả trong 3 tháng với 4 người. Tư vấn: (1) <strong>Phân loại must-have vs nice-to-have</strong>: hỏi khách hàng "Nếu chỉ có 3 module, bạn chọn gì?" — thường là Kho + Bán hàng + Kế toán cơ bản; (2) <strong>Phased delivery</strong>: MVP 3 tháng (3 module core), Phase 2 sau 3 tháng tiếp (Mua hàng + Nhân sự), Phase 3 (Sản xuất + CRM); (3) <strong>Tránh over-engineering</strong>: không build sản xuất đầy đủ nếu khách hàng chỉ có 2 sản phẩm; (4) <strong>Integrate với tool sẵn có</strong>: dùng MISA cho kế toán, tích hợp API thay vì tự build; (5) Ký hợp đồng theo phase với acceptance criteria rõ ràng.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════
+     CHỨNG NHẬN
+═══════════════════════════════════ -->
+<div class="section fade" id="cert">
+  <div class="sec-label">Hoàn thành khoá học</div>
+
+  <div class="cert">
+    <div class="cert-badge">
+      <span style="width:8px;height:8px;background:var(--amber);border-radius:50%;display:inline-block"></span>
+      Chứng nhận hoàn thành
+    </div>
+    <div class="cert-title">ERP Business Knowledge<br>for Software Engineers</div>
+    <div class="cert-sub">Đã hoàn thành chương trình đào tạo nghiệp vụ ERP dành cho kỹ sư phần mềm<br>bao gồm 5 giai đoạn · ~12 ngày học · 18 bài tập thực hành · 3 workshop thực chiến</div>
+    <div class="cert-modules">
+      <span class="cert-mod" style="border-color:var(--blue-md);color:var(--blue);background:var(--blue-lt)">✓ GĐ1 Doanh nghiệp</span>
+      <span class="cert-mod" style="border-color:var(--teal-md);color:var(--teal);background:var(--teal-lt)">✓ GĐ2 Module ERP</span>
+      <span class="cert-mod" style="border-color:var(--amber-md);color:var(--amber);background:var(--amber-lt)">✓ GĐ3 Workflow</span>
+      <span class="cert-mod" style="border-color:var(--purple-md);color:var(--purple);background:var(--purple-lt)">✓ GĐ4 Dashboard</span>
+      <span class="cert-mod" style="border-color:var(--green-md);color:var(--green);background:var(--green-lt)">✓ GĐ5 Workshop</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:16px 0;text-align:left">
+      <div style="padding:12px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Năng lực đạt được</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.8;font-weight:300">
+          ✓ Đọc &amp; vẽ workflow BPMN<br>
+          ✓ Phân tích nghiệp vụ SMB<br>
+          ✓ Thiết kế data model ERP<br>
+          ✓ Identify exception flows<br>
+          ✓ Thiết kế KPI dashboard
+        </div>
+      </div>
+      <div style="padding:12px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Thuật ngữ thành thạo</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.8;font-weight:300">
+          ✓ SO, PO, GRN, DO, AR, AP<br>
+          ✓ FIFO, AVG, BOM, MRP<br>
+          ✓ COGM, P&amp;L, Journal Entry<br>
+          ✓ 3-way matching, Credit limit<br>
+          ✓ Credit Note, State Machine
+        </div>
+      </div>
+      <div style="padding:12px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--border)">
+        <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:4px">Nguyên tắc cốt lõi</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.8;font-weight:300">
+          ✓ Không bao giờ hard delete<br>
+          ✓ Transaction = ACID đầy đủ<br>
+          ✓ 3 luồng phải nhất quán<br>
+          ✓ Exception cần approval<br>
+          ✓ Lưu breakdown, tính tổng
+        </div>
+      </div>
+    </div>
+    <div style="margin:16px 0;display:flex;justify-content:center">
+      <button onclick="window.print()" style="font-family:var(--font);font-size:12px;font-weight:600;color:var(--white);background:var(--text);border:none;padding:10px 24px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px">
+        🖨️ In chứng nhận
+      </button>
+    </div>
+    <div class="cert-sign">
+      Chương trình đào tạo ERP Business Knowledge for Software Engineers · 5 giai đoạn · 2024
+    </div>
+  </div>
+
+  <!-- Next steps -->
+  <div class="card">
+    <div class="card-title"><div class="cd" style="background:var(--blue)"></div>Bước tiếp theo sau khoá học</div>
+    <div class="terms">
+      <div class="term">
+        <div class="term-name">Thực hành với ERP thực tế</div>
+        <div class="term-def">Cài thử Odoo Community (miễn phí, mã nguồn mở). Tạo scenario giả lập và trace từng giao dịch qua các module. Xem code thực tế của một ERP production-grade.</div>
+      </div>
+      <div class="term">
+        <div class="term-name">Khảo sát khách hàng thực</div>
+        <div class="term-def">Sử dụng bộ câu hỏi từ M3.4 để phỏng vấn một doanh nghiệp thực tế. Vẽ lại workflow của họ và so sánh với lý thuyết đã học.</div>
+      </div>
+      <div class="term">
+        <div class="term-name">Deep dive vào kế toán VN</div>
+        <div class="term-def">Đọc Thông tư 200 (chế độ kế toán DN lớn) hoặc Thông tư 133 (DN nhỏ). Hiểu hệ thống tài khoản kế toán Việt Nam (từ 1xx đến 9xx).</div>
+      </div>
+      <div class="term">
+        <div class="term-name">Tham khảo ERP chuẩn ngành</div>
+        <div class="term-def">Nghiên cứu tài liệu của Odoo, SAP Business One, hoặc Microsoft Business Central để hiểu cách các hệ thống lớn giải quyết các vấn đề phức tạp.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</main>
+
+<script>
+// Scroll fade
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')});
+},{threshold:0.04});
+document.querySelectorAll('.fade').forEach(el=>io.observe(el));
+
+// Active nav
+const links=[...document.querySelectorAll('.sidebar .nav-a[href^="#"]')];
+const targets=links.map(l=>document.querySelector(l.getAttribute('href'))).filter(Boolean);
+window.addEventListener('scroll',()=>{
+  let cur='';
+  targets.forEach(t=>{if(window.scrollY>=t.offsetTop-130)cur='#'+t.id});
+  links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')===cur));
+});
+
+// Check toggles
+function toggleCheck(el){
+  el.classList.toggle('checked');
+  updateProgress();
+}
+
+function updateProgress(){
+  const all=document.querySelectorAll('.del-check');
+  const done=document.querySelectorAll('.del-check.checked');
+  const pct=Math.round((done.length/all.length)*100);
+  // Just visual feedback on the phase 5 tracker
+}
+
+// Toggle exam answers
+function toggleAnswer(btn){
+  const ans=btn.nextElementSibling;
+  const showing=ans.style.display==='block';
+  ans.style.display=showing?'none':'block';
+  btn.textContent=showing?'Xem đáp án tham khảo':'Ẩn đáp án';
+}
+
+// Phase tracker
+let phases={1:true,2:true,3:true,4:true,5:false};
+function togglePhase(el,n){
+  phases[n]=!phases[n];
+  el.classList.toggle('done',phases[n]);
+  el.classList.toggle('current',!phases[n]&&n===5);
+  const ph5n=document.getElementById('ph5n');
+  if(n===5) ph5n.textContent=phases[5]?'✓':'5';
+  const total=Object.values(phases).filter(Boolean).length;
+  const pct=Math.round(total/5*100);
+  document.getElementById('main-bar').style.width=pct+'%';
+  document.getElementById('pct-txt').textContent=pct+'%';
+  const note=document.getElementById('pt-note');
+  if(pct===100){
+    note.textContent='🎉 Hoàn thành toàn bộ khoá học! Hãy in chứng nhận bên dưới.';
+    note.style.color='var(--green)';
+    note.style.fontWeight='500';
+  } else {
+    note.textContent=`Đã hoàn thành ${total}/5 giai đoạn (${pct}%)`;
+    note.style.color='';
+    note.style.fontWeight='';
+  }
+}
+
+// Animate progress bar on load
+setTimeout(()=>{
+  document.getElementById('main-bar').style.width='80%';
+},300);
+</script>
+</body>
+</html>
